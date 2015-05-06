@@ -31,6 +31,7 @@ class MicrophoneListener(minion.sensing.base.ContinuousSensor):
     def _build_sox_command(self, filename):
         raise NotImplementedError('_build_sox_command needs to be implemented in MicrophoneListener subclasses')
 
+
 class MicrophoneSelectiveListener(MicrophoneListener):
     configuration = {
         'format': 'flac',
@@ -44,22 +45,16 @@ class MicrophoneSelectiveListener(MicrophoneListener):
         'silence_post_duration': 0.8,
     }
     period = 0.1
+
     def _update_configuration(self, configuration):
-        logger.debug(configuration)
         if 'silence' in configuration:
             silence = configuration['silence']
-            logger.debug(silence)
             for when in ('pre', 'post'):
-                logger.debug(when)
                 if when in silence:
                     when_config = silence[when]
-                    logger.debug(when_config)
                     for what in ('level', 'trim', 'duration'):
                         if what in when_config:
                             self.configuration['silence_{}_{}'.format(when, what)] = when_config[what]
-
-        logger.debug(configuration)
-
 
     def _build_sox_command(self, f):
         print '/usr/bin/rec -c {channels} {tempfile} rate {rate} silence {silence_pre_trim} {silence_pre_duration} {silence_pre_level} {silence_post_trim} {silence_post_duration} {silence_post_level}'.format(tempfile=f.name, **self.configuration)
