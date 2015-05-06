@@ -17,7 +17,7 @@ class DurationLimit(minion.postprocessors.BasePostprocessor):
         # TODO see if we can avoid the temp file
         file_format = '.{}'.format(self.configuration['type'])
         with tempfile.NamedTemporaryFile(suffix=file_format) as original_file:
-            out = subprocess.check_output('/usr/bin/soxi -D {}'.format(original_file.name))
+            out = subprocess.check_output('/usr/bin/soxi -D {}'.format(original_file.name), shell=True)
             try:
                 duration = float(out)
             # TODO What exceptions do we expect?
