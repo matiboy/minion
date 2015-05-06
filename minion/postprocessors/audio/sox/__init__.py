@@ -3,7 +3,7 @@ import tempfile
 import minion.postprocessors
 
 
-class TimeLimitation(minion.postprocessors.BasePostprocessor):
+class DurationLimit(minion.postprocessors.BasePostprocessor):
     configuration = {
         'type': 'flac',
         'maxlength': 10
