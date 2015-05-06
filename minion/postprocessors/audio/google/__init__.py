@@ -1,8 +1,6 @@
-import subprocess
 import minion.postprocessors
 import random
 import requests
-import tempfile
 
 
 class GoogleSpeechToText(minion.postprocessors.BasePostprocessor):
