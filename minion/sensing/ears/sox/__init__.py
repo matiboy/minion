@@ -27,6 +27,7 @@ class MicrophoneListener(minion.sensing.base.ContinuousSensor):
             logger.debug(audio_temporary_file.name)
             subprocess.call(self._build_sox_command(audio_temporary_file), shell=True)
             audio_data = audio_temporary_file.read()
+            return audio_data
 
     def _build_sox_command(self, filename):
         raise NotImplementedError('_build_sox_command needs to be implemented in MicrophoneListener subclasses')
