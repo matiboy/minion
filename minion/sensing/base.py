@@ -31,10 +31,13 @@ class BaseSensor(object):
 
     def run(self):
         data = self.sense()
-        processed = self.post_processed(data)
-        return processed
+        self.post_process(data)
+        return
 
-    def post_processed(self, data):
+    def post_process(self, data):
+        for p in self.postprocessors:
+            logger.debug(p)
+            data = p.process(data)
         return data
 
     def sense(self):
