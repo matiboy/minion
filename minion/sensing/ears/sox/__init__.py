@@ -56,7 +56,7 @@ class MicrophoneSelectiveListener(MicrophoneListener):
                     logger.debug(when_config)
                     for what in ('level', 'trim', 'duration'):
                         if what in when_config:
-                            configuration['silence_{}_{}'.format(when, what)] = when_config[what]
+                            self.configuration['silence_{}_{}'.format(when, what)] = when_config[what]
 
         logger.debug(configuration)
 
