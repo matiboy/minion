@@ -36,23 +36,29 @@ class MicrophoneSelectiveListener(MicrophoneListener):
         'format': 'flac',
         'rate': '16000',
         'channels': 1,
-        'silence_pre_level': '10%',
+        'silence_pre_level': '4%',
         'silence_pre_trim': 1,
         'silence_pre_duration': 0.5,
-        'silence_post_level': '10%',
+        'silence_post_level': '4%',
         'silence_post_trim': 0,
         'silence_post_duration': 0.8,
     }
     period = 0.1
     def _update_configuration(self, configuration):
+        logger.debug(configuration)
         if 'silence' in configuration:
             silence = configuration['silence']
+            logger.debug(silence)
             for when in ('pre', 'post'):
+                logger.debug(when)
                 if when in silence:
                     when_config = silence[when]
+                    logger.debug(when_config)
                     for what in ('level', 'trim', 'duration'):
                         if what in when_config:
                             configuration['silence_{}_{}'.format(when, what)] = when_config[what]
+
+        logger.debug(configuration)
 
 
     def _build_sox_command(self, f):
