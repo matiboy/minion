@@ -21,7 +21,6 @@ class DurationLimit(minion.postprocessors.BasePostprocessor):
         file_format = '.{}'.format(self.configuration['type'])
         with tempfile.NamedTemporaryFile(suffix=file_format, delete=False) as original_file:
             original_file.write(data)
-            logger.
             logger.debug('/usr/bin/soxi -D {}'.format(original_file.name))
             out = subprocess.check_output('/usr/bin/soxi -D {}'.format(original_file.name), shell=True)
             logger.debug(out)
