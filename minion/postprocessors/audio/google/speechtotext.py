@@ -29,8 +29,7 @@ class GoogleSpeechToText(minion.postprocessors.BasePostprocessor):
         files = {
             'file': ('file.{}'.format(self.configuration['type']), data)
         }
-        logger.debug(headers)
-        logger.debug(params)
+
         # TODO handle errors
         response = requests.post(self.configuration['url'], params=params, headers=headers, files=files)
 
