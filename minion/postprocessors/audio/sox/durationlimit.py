@@ -19,8 +19,9 @@ class DurationLimit(minion.postprocessors.BasePostprocessor):
         # Write to a temporary file
         # TODO see if we can avoid the temp file
         file_format = '.{}'.format(self.configuration['type'])
-        with tempfile.NamedTemporaryFile(suffix=file_format) as original_file:
+        with tempfile.NamedTemporaryFile(suffix=file_format, delete=False) as original_file:
             original_file.write(data)
+            logger.
             logger.debug('/usr/bin/soxi -D {}'.format(original_file.name))
             out = subprocess.check_output('/usr/bin/soxi -D {}'.format(original_file.name), shell=True)
             logger.debug(out)
@@ -33,6 +34,8 @@ class DurationLimit(minion.postprocessors.BasePostprocessor):
             else:
                 # Check if audio is too long
                 if not self._is_too_long(duration):
+                    logger.debug('Duration is ok')
+                    logger.debug('Saved in %s', original_file.name)
                     return data
 
                 with tempfile.NamedTemporaryFile(suffix=file_format) as reduced_file:
