@@ -2,6 +2,7 @@ from . import errors
 import time
 import multiprocessing
 import minion.utils.module_loading
+import threading
 
 logger = multiprocessing.get_logger()
 
@@ -43,9 +44,11 @@ class BaseSensor(object):
     def sense(self):
         raise NotImplementedError('Sense method needs to be implemented on sensor')
 
+
 class AlwaysOnSensor(object):
     def is_active(self):
         return True
+
 
 class ContinuousSensor(BaseSensor):
     def __init__(self, configuration={}, preprocessors=[], postprocessors=[], **kwargs):
@@ -61,5 +64,5 @@ class ContinuousSensor(BaseSensor):
             except errors.DataUnavailable:
                 pass
             else:
-                self.post_process(data)
+                threading.Thread(target=self.post_process, args=(data,)).start()
             time.sleep(self.period)
