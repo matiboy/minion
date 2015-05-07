@@ -2,6 +2,7 @@ import minion.postprocessors
 import random
 import requests
 import multiprocessing
+import json
 
 logger = multiprocessing.get_logger()
 
@@ -30,9 +31,17 @@ class GoogleSpeechToText(minion.postprocessors.BasePostprocessor):
         }
         logger.debug(headers)
         logger.debug(params)
+        # TODO handle errors
         response = requests.post(self.configuration['url'], params=params, headers=headers, files=files)
 
         lines = response.text.split('\n')
 
-        print lines
-        logger.debug(lines)
+        message = 'ERROR Unable to translate speech to text'
+        for line in lines:
+            content = json.loads(line)
+            results = content.get('result', [])
+            if results.__len__():
+                result = results[0]
+                message = result['alternative'][0]['transcript']
+
+        return message
