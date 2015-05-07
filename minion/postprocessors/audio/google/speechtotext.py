@@ -11,7 +11,7 @@ class GoogleSpeechToText(minion.postprocessors.BasePostprocessor):
         'url': 'http://www.google.com/speech-api/v2/recognize',
         'lang': 'en-us',
         'client': 'chromium',
-        'Content-Type': 'audio/x-flac; rate 16000',
+        'Content-Type': 'audio/x-flac; rate 16000;',
         'keys': [],
         'type': 'flac'
     }
@@ -28,6 +28,8 @@ class GoogleSpeechToText(minion.postprocessors.BasePostprocessor):
         files = {
             'file': ('file.{}'.format(self.configuration['type']), data)
         }
+        logger.debug(headers)
+        logger.debug(params)
         response = requests.post(self.configuration['url'], params=params, headers=headers, files=files)
 
         lines = response.text.split('\n')
