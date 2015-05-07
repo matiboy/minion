@@ -38,11 +38,15 @@ class GoogleSpeechToText(minion.postprocessors.BasePostprocessor):
 
         message = 'ERROR Unable to translate speech to text'
         for line in lines:
-            logger.debug(line)
-            content = json.loads(line)
+            try:
+                content = json.loads(line)
+            except ValueError:
+                logger.error('Unable to load json content %s', line)
+                continue
             results = content.get('result', [])
             if results.__len__():
                 result = results[0]
                 message = result['alternative'][0]['transcript']
+                break
         logger.debug(message)
         return message
