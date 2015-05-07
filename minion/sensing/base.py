@@ -10,7 +10,9 @@ logger = multiprocessing.get_logger()
 class BaseSensor(object):
     active = True
 
-    def __init__(self, configuration={}, preprocessors=[], postprocessors=[], **kwargs):
+    def __init__(self, nervous_system, configuration={}, preprocessors=[], postprocessors=[], **kwargs):
+        self.name = configuration.get('name', 'anonymous')
+        self.nervous_system = nervous_system
         processors = []
         for p in postprocessors:
             try:
@@ -24,6 +26,13 @@ class BaseSensor(object):
 
         self.preprocessors = preprocessors
 
+        # Try updating configuration if it exists on the class
+        try:
+            self.configuration.update(configuration)
+        except AttributeError:
+            self.configuration = configuration
+        logger.info('Sensor <%s> created with configuration %s', self.name, self.configuration)
+
     def is_active(self):
         # Run all the preprocessors of type ActiveStatePreprocessor
         for p in self.preprocessors:
@@ -35,11 +44,19 @@ class BaseSensor(object):
         self.post_process(data)
         return
 
+    # Publish channel override
+    # By defaut, leaves it to the nervous system to decide which channel messages are sent on
+    def _get_publish_channel(self):
+        return None
+
     def post_process(self, data):
+        logger.debug('Sensor data received, preparing to post process')
         for p in self.postprocessors:
             logger.debug(p)
             data = p.process(data)
-        return data
+
+        # Use nervous system to pass on data
+        self.nervous_system.publish(channel=self._get_publish_channel(), message=data)
 
     def sense(self):
         raise NotImplementedError('Sense method needs to be implemented on sensor')
@@ -51,11 +68,18 @@ class AlwaysOnSensor(object):
 
 
 class ContinuousSensor(BaseSensor):
-    def __init__(self, configuration={}, preprocessors=[], postprocessors=[], **kwargs):
-        super(ContinuousSensor, self).__init__(configuration, preprocessors, postprocessors, **kwargs)
+    # Key that the constructor will look for either on the class or in the configuration
+    period_attribute = 'period'
+
+    def __init__(self, nervous_system, configuration={}, preprocessors=[], postprocessors=[], **kwargs):
+        super(ContinuousSensor, self).__init__(nervous_system, configuration, preprocessors, postprocessors, **kwargs)
         # Make sure we have a period
-        if not hasattr(self, 'period') and not configuration.get('period'):
+        if not hasattr(self, self.period_attribute) and self.period_attribute not in configuration:
             raise errors.ImproperlyConfigured('Continous sensor requires a sensing period')
+        # Keep the period
+        if self.period_attribute in configuration:
+            self.period = configuration[self.period_attribute]
+        logger.debug('Creating continuous sensor <%s> with period %s', self.name, self.period)
 
     def run(self):
         while self.is_active():

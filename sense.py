@@ -15,6 +15,12 @@ if __name__ == '__main__':
         raise IOError('Settings file not found: {}. Set the environment variable MINION_SETTINGS to the correct path'.format(settings))
 
     # Ativate the communication system
+    try:
+        nerve_settings = sensor_settings['nerve']
+    except KeyError:
+        raise KeyError('You must provide a nervous system')
+    nervous_system_class = minion.utils.module_loading.import_string(nerve_settings['class'])
+    nervous_system = nervous_system_class(**nerve_settings)
 
     # Start all the sensors
     sensor_processes = []
@@ -23,10 +29,13 @@ if __name__ == '__main__':
         sensor_class = minion.utils.module_loading.import_string(sensor_details['class'])
 
         # instantiate
-        sensor = sensor_class(**sensor_details)
+        sensor = sensor_class(nervous_system, **sensor_details)
 
         d = multiprocessing.Process(name=sensor_details['name'], target=sensor.run)
 
         d.start()
 
+        sensor_processes.append(d)
+
+    for d in sensor_processes:
         d.join(100000000)

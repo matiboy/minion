@@ -6,14 +6,16 @@ import multiprocessing
 
 logger = multiprocessing.get_logger()
 
+
 class MicrophoneListener(minion.sensing.base.ContinuousSensor):
     configuration = {
         'format': 'flac',
         'rate': '16000',
         'channels': 1
     }
-    def __init__(self, configuration={}, preprocessors=[], postprocessors=[], **kwargs):
-        super(MicrophoneListener, self).__init__(configuration, preprocessors, postprocessors, **kwargs)
+
+    def __init__(self, nervous_system, configuration={}, preprocessors=[], postprocessors=[], **kwargs):
+        super(MicrophoneListener, self).__init__(nervous_system, configuration, preprocessors, postprocessors, **kwargs)
         self._update_configuration(configuration)
 
     def _update_configuration(self, configuration):
