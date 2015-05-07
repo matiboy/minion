@@ -43,5 +43,5 @@ class GoogleSpeechToText(minion.postprocessors.BasePostprocessor):
             if results.__len__():
                 result = results[0]
                 message = result['alternative'][0]['transcript']
-
+        logger.debug(message)
         return message
