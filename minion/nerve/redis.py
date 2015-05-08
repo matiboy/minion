@@ -25,9 +25,16 @@ class NervousSystem(object):
             raise errors.ImproperlyConfigured
         else:
             logger.info('Connection established to redis server {host}:{port} on db {db}'.format(**self.configuration))
-        self.subscribing_redis_client = redis.StrictRedis(**self.configuration)
-        if 'channel' in configuration:
-            self.channel = configuration['channel']
+        # Publishing channel
+        if 'channel' in self.configuration:
+            self.channel = self.configuration['channel']
+        # If we have channels, means we are listening
+        if 'channels' in kwargs:
+            self.subscribing_redis_client = redis.StrictRedis(**self.configuration)
+            self.channels = kwargs['channels']
+            self.pubsub = self.subscribing_redis_client.pubsub()
+            logger.info('Nervous system is now listening to channels %s', ', '.join(self.channels))
+            self.pubsub.subscribe(*self.channels)
 
     def publish(self, channel=None, message=''):
         if not channel:
@@ -35,3 +42,6 @@ class NervousSystem(object):
 
         logger.debug('Nervous system publishing message %s on channel %s', message, channel)
         self.redis_client.publish(channel, message)
+
+    def listen(self):
+        return self.pubsub.listen()
