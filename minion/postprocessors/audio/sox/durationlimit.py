@@ -34,12 +34,11 @@ class DurationLimit(minion.postprocessors.BasePostprocessor):
                 # Check if audio is too long
                 if not self._is_too_long(duration):
                     logger.debug('Duration is ok')
-                    logger.debug('Saved in %s', original_file.name)
                     return data
 
                 with tempfile.NamedTemporaryFile(suffix=file_format) as reduced_file:
                     subprocess.call(self._build_sox_call(duration, original_file, reduced_file), shell=True)
                     return reduced_file.read()
 
-    def _build_sox_call(duration, original, target):
+    def _build_sox_call(self, duration, original, target):
         return '/usr/bin/sox {} {} trim {} {}'.format(original.name, target.name, duration, duration+1)

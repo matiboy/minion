@@ -1,12 +1,13 @@
 from __future__ import absolute_import
 from . import errors
+from . import base
 import multiprocessing
 import redis
 
 logger = multiprocessing.get_logger()
 
 
-class NervousSystem(object):
+class NervousSystem(base.BaseNervousSystem):
     configuration = {
         'host': 'localhost',
         'port': 6379,
@@ -15,9 +16,10 @@ class NervousSystem(object):
     channel = 'minion:command'
 
     def __init__(self, configuration={}, **kwargs):
-        self.configuration.update(configuration)
-        logger.info('Starting Redis nervous system with configuration %s', self.configuration)
+        super(NervousSystem, self).__init__(configuration)
+
         self.redis_client = redis.StrictRedis(**self.configuration)
+
         try:
             self.redis_client.ping()
         except redis.ConnectionError:
@@ -28,6 +30,7 @@ class NervousSystem(object):
         # Publishing channel
         if 'channel' in self.configuration:
             self.channel = self.configuration['channel']
+
         # If we have channels, means we are listening
         if 'channels' in kwargs:
             self.subscribing_redis_client = redis.StrictRedis(**self.configuration)

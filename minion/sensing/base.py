@@ -31,7 +31,15 @@ class BaseSensor(object):
             self.configuration.update(configuration)
         except AttributeError:
             self.configuration = configuration
+
+        try:
+            self._validate_configuration()
+        except errors.ImproperlyConfigured as e:
+            raise errors.ImproperlyConfigured('Sensor <%s> has invalid configuration: %s', self.name, e)
         logger.info('Sensor <%s> created with configuration %s', self.name, self.configuration)
+
+    def _validate_configuration(self):
+        return
 
     def is_active(self):
         # Run all the preprocessors of type ActiveStatePreprocessor

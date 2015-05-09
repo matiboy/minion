@@ -1,5 +1,6 @@
 import apiai
 import json
+import tempfile
 import minion.postprocessors
 import minion.postprocessors.errors
 import multiprocessing
@@ -22,7 +23,21 @@ class ApiaiSpeechToText(minion.postprocessors.BasePostprocessor):
         ai = apiai.ApiAI(CLIENT_ACCESS_TOKEN, SUBSCRIBTION_KEY)
         request = ai.voice_request()
         request.send(data)
+        with tempfile.NamedTemporaryFile(delete=False) as f:
+            f.write(data)
+            bytessize = 2048
+            data = f.read(bytessize)
+            logger.debug(f.name)
+            while data:
+                request.send(data)
+                data = f.read(bytessize)
 
         response = request.getresponse()
 
-        print response
+        try:
+            data = json.loads(response.read())
+            return data['result']['resolvedQuery']
+        except ValueError, KeyError:
+            # Acceptable errors which just mean we couldn't understand
+            # TODO or should we raise?
+            pass

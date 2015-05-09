@@ -19,6 +19,7 @@ class MicrophoneListener(minion.sensing.base.ContinuousSensor):
         self._update_configuration(configuration)
 
     def _update_configuration(self, configuration):
+        self.configuration = self.configuration.copy()
         self.configuration.update(configuration)
 
     def _get_tempfile_suffix(self):
@@ -50,6 +51,8 @@ class MicrophoneSelectiveListener(MicrophoneListener):
     period = 0.1
 
     def _update_configuration(self, configuration):
+        super(MicrophoneSelectiveListener, self)._update_configuration(configuration)
+
         if 'silence' in configuration:
             silence = configuration['silence']
             for when in ('pre', 'post'):

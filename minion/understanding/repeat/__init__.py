@@ -7,7 +7,7 @@ class RepeatAfterMe(minion.understanding.base.BaseCommand):
         'expressions': [r'^repeat after me (?P<what_to_repeat>.*)$']
     }
 
-    def understand(self, *commands):
+    def _understand(self, *commands):
         # Doesn't expect multi
         command = commands[0]
-        return self.configuration['action'], command
+        return minion.understanding.base.UnderstandingCommand(self.configuration['action'], command)

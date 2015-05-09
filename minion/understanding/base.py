@@ -4,6 +4,26 @@ import multiprocessing
 logger = multiprocessing.get_logger()
 
 
+class UnderstandingCommand(object):
+    used = False
+    def __init__(self, action, message):
+        self.action = action
+        self.message = message
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        if not self.used:
+            self.used = True
+            return self
+
+        raise StopIteration
+
+    def publish(self, nervous_system):
+        nervous_system.publish(self.action, self.message)
+
+
 class BaseCommand(object):
     configuration = {
         'action': 'noop',
@@ -20,7 +40,14 @@ class BaseCommand(object):
         self.expressions = [re.compile(exp) for exp in self.configuration['expressions']]
         logger.info('Command <%s> will respond to the following expressions: %s', self.name, self.expressions)
 
-    def understand(self, *commands):
+    def understand(self, nervous_system, *commands):
+        actions = self._understand(*commands)
+        logger.debug(actions)
+        for action in actions:
+            logger.debug(action)
+            action.publish(nervous_system)
+
+    def _understand(self, *commands):
         raise NotImplementedError('"Understand" method must be implemented in command')
 
     def is_blocking_command(self):
