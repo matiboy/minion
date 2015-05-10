@@ -37,7 +37,7 @@ class ApiaiSpeechToText(minion.postprocessors.BasePostprocessor):
         try:
             data = json.loads(response.read())
             return data['result']['resolvedQuery']
-        except ValueError, KeyError:
+        except (ValueError, KeyError,):
             # Acceptable errors which just mean we couldn't understand
             # TODO or should we raise?
             pass

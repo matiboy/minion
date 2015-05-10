@@ -40,18 +40,24 @@ class MicrophoneSelectiveListener(MicrophoneListener):
     configuration = {
         'format': 'flac',
         'rate': '16000',
-        'channels': 1,
         'silence_pre_level': '4%',
         'silence_pre_trim': 1,
         'silence_pre_duration': 0.5,
         'silence_post_level': '4%',
         'silence_post_trim': 0,
         'silence_post_duration': 0.8,
+        'options': {
+            'c': 1,
+            'b': 16
+        }
     }
     period = 0.1
 
     def _update_configuration(self, configuration):
         super(MicrophoneSelectiveListener, self)._update_configuration(configuration)
+
+        options = ['-{} {}'.format(key, value) for key, value in self.configuration.get('options', {}).iteritems()]
+        self.configuration['options'] = ' '.join(options)
 
         if 'silence' in configuration:
             silence = configuration['silence']
@@ -63,5 +69,5 @@ class MicrophoneSelectiveListener(MicrophoneListener):
                             self.configuration['silence_{}_{}'.format(when, what)] = when_config[what]
 
     def _build_sox_command(self, f):
-        print '/usr/bin/rec -c {channels} {tempfile} rate {rate} silence {silence_pre_trim} {silence_pre_duration} {silence_pre_level} {silence_post_trim} {silence_post_duration} {silence_post_level}'.format(tempfile=f.name, **self.configuration)
-        return '/usr/bin/rec -c {channels} {tempfile} rate {rate} silence {silence_pre_trim} {silence_pre_duration} {silence_pre_level} {silence_post_trim} {silence_post_duration} {silence_post_level}'.format(tempfile=f.name, **self.configuration)
+        logger.debug('/usr/bin/rec {options} {tempfile} rate {rate} silence {silence_pre_trim} {silence_pre_duration} {silence_pre_level} {silence_post_trim} {silence_post_duration} {silence_post_level}'.format(tempfile=f.name, **self.configuration))
+        return '/usr/bin/rec {options} {tempfile} rate {rate} silence {silence_pre_trim} {silence_pre_duration} {silence_pre_level} {silence_post_trim} {silence_post_duration} {silence_post_level}'.format(tempfile=f.name, **self.configuration)

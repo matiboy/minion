@@ -28,6 +28,7 @@ class BaseSensor(object):
 
         # Try updating configuration if it exists on the class
         try:
+            self.configuration = self.configuration.copy()
             self.configuration.update(configuration)
         except AttributeError:
             self.configuration = configuration
