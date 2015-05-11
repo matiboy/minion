@@ -1,3 +1,7 @@
+from . import class_validation
+from . import exceptions
+
+
 class BaseComponent(object):
     configuration = {}
 
@@ -23,3 +27,14 @@ class BaseComponent(object):
             Should raise ImproperlyConfigured if any issue
         """
         pass
+
+
+class NervousComponent(BaseComponent):
+    """
+        Very similar to BaseComponent but requires a nervous system instance to be passed
+    """
+    def __init__(self, name, nervous_system, configuration={}):
+        if not class_validation.is_nervous_system(nervous_system):
+            raise exceptions.ImproperlyConfigured('Nervous system does not appear to have the necessary methods')
+        self.nervous_system = nervous_system
+        super(NervousComponent, self).__init__(name, configuration)

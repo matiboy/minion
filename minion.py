@@ -2,11 +2,13 @@ import json
 import minion.utils.module_loading
 import minion.understanding.errors
 import minion.core
+import minion.core.components.exceptions
 import os
 import multiprocessing
 import logging
 import time
 import threading
+import sys
 
 
 if __name__ == '__main__':
@@ -29,18 +31,22 @@ if __name__ == '__main__':
         raise KeyError('You must provide a nervous system')
 
     my_minion.attach_nervous_system(nerve_settings)
+
     # Start all the sensors
+    sensor_details = settings.get('sensors', [])
+
+    # Might raise NameConflict if two sensors have the same name
+    my_minion.attach_sensors(*sensor_details)
+
+    # Start all the actuators
+    actuators_details = settings.get('actuators', [])
+
+    # Might raise NameConflict if two actuators have the same name
+    my_minion.attach_actuators(*actuators_details)
+
+    my_minion.loop()
     """logger = multiprocessing.get_logger()
-    for sensor_details in settings.get('sensors', []):
-        sensor_class = minion.utils.module_loading.import_string(sensor_details['class'])
-
-        # instantiate
-        sensor = sensor_class(nervous_system, **sensor_details)
-
-        d = multiprocessing.Process(name=sensor_details['configuration'].get('name', 'thread'), target=sensor.run)
-
-        d.start()
-
+    
     # Register all actuators
     actuator_instances = []
     for actuator_details in settings.get('actuators', []):

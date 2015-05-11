@@ -1,17 +1,18 @@
-from . import errors
+from . import exceptions
 import time
 import multiprocessing
+import minion.core.components
 import minion.utils.module_loading
 import threading
 
 logger = multiprocessing.get_logger()
 
 
-class BaseSensor(object):
+class BaseSensor(minion.core.components.NervousComponent):
     active = True
 
-    def __init__(self, nervous_system, configuration={}, preprocessors=[], postprocessors=[], **kwargs):
-        self.name = configuration.get('name', 'anonymous')
+    def __init__(self, name, nervous_system, configuration={}, preprocessors=[], postprocessors=[], **kwargs):
+        super(BaseSensor, self).__init__(name, nervous_system, configuration)
         self.nervous_system = nervous_system
         processors = []
         for p in postprocessors:
@@ -35,9 +36,9 @@ class BaseSensor(object):
 
         try:
             self._validate_configuration()
-        except errors.ImproperlyConfigured as e:
-            raise errors.ImproperlyConfigured('Sensor <%s> has invalid configuration: %s', self.name, e)
-        logger.info('Sensor <%s> created with configuration %s', self.name, self.configuration)
+        except exceptions.ImproperlyConfigured as e:
+            raise exceptions.ImproperlyConfigured('Sensor <%s> has invalid configuration: %s', self.name, e)
+        logger.info('Sensor <%s> created with configuration %s', self.name, self._configuration)
 
     def _validate_configuration(self):
         return
@@ -80,11 +81,11 @@ class ContinuousSensor(BaseSensor):
     # Key that the constructor will look for either on the class or in the configuration
     period_attribute = 'period'
 
-    def __init__(self, nervous_system, configuration={}, preprocessors=[], postprocessors=[], **kwargs):
-        super(ContinuousSensor, self).__init__(nervous_system, configuration, preprocessors, postprocessors, **kwargs)
+    def __init__(self, name, nervous_system, configuration={}, preprocessors=[], postprocessors=[], **kwargs):
+        super(ContinuousSensor, self).__init__(name, nervous_system, configuration, preprocessors, postprocessors, **kwargs)
         # Make sure we have a period
         if not hasattr(self, self.period_attribute) and self.period_attribute not in configuration:
-            raise errors.ImproperlyConfigured('Continous sensor requires a sensing period')
+            raise exceptions.ImproperlyConfigured('Continous sensor requires a sensing period')
         # Keep the period
         if self.period_attribute in configuration:
             self.period = configuration[self.period_attribute]
@@ -94,7 +95,7 @@ class ContinuousSensor(BaseSensor):
         while self.is_active():
             try:
                 data = self.sense()
-            except errors.DataUnavailable:
+            except exceptions.DataUnavailable:
                 pass
             else:
                 threading.Thread(target=self.post_process, args=(data,)).start()

@@ -17,8 +17,9 @@ def blop(f):
     t.join()
 
 class PygletPlayer(minion.acting.base.BaseActuator):
-    def __init__(self, name='', channels=[], configuration={}, **kwargs):
-        super(PygletPlayer, self).__init__(name, channels, configuration, **kwargs)
+    def __init__(self, name, configuration, channels=[], **kwargs):
+        super(PygletPlayer, self).__init__(name, configuration, channels, **kwargs)
+        self.channels = channels
         self.player = pyglet.media.Player()
         self.player.eos_action = pyglet.media.Player.EOS_NEXT
 
