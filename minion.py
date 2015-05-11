@@ -1,15 +1,17 @@
 import json
 import minion.utils.module_loading
 import minion.understanding.errors
+import minion.core
 import os
 import multiprocessing
 import logging
 import time
 import threading
 
-settings = os.getenv('MINION_SETTINGS', 'settings.json')
 
 if __name__ == '__main__':
+    settings = os.getenv('MINION_SETTINGS', 'settings.json')
+    # TODO read that from arguments
     multiprocessing.log_to_stderr(logging.DEBUG)
     try:
         with open(settings) as settings_file:
@@ -17,16 +19,18 @@ if __name__ == '__main__':
     except IOError:
         raise IOError('Settings file not found: {}. Set the environment variable MINION_SETTINGS to the correct path'.format(settings))
 
+    # Rise, minion
+    my_minion = minion.core.Minion()
+
     # Ativate the communication system
     try:
         nerve_settings = settings['nerve']
     except KeyError:
         raise KeyError('You must provide a nervous system')
-    nervous_system_class = minion.utils.module_loading.import_string(nerve_settings['class'])
-    nervous_system = nervous_system_class(**nerve_settings)
 
+    my_minion.attach_nervous_system(nerve_settings)
     # Start all the sensors
-    logger = multiprocessing.get_logger()
+    """logger = multiprocessing.get_logger()
     for sensor_details in settings.get('sensors', []):
         sensor_class = minion.utils.module_loading.import_string(sensor_details['class'])
 
@@ -77,3 +81,4 @@ if __name__ == '__main__':
                         actuator.act(m.get_message())      
 
         time.sleep(settings.get('delay', 0.01))
+    """
