@@ -37,4 +37,6 @@ class ShellCommandActuator(BaseActuator):
 
     def act(self, *args, **kwargs):
         command = self._build_command(*args, **kwargs)
-        subprocess.call(command, shell=self.shell)
+        exit_code = subprocess.call(command, shell=self.shell)
+        if exit_code:
+            logger.info('Command "%s" with shell set as %s exited with code %s', ' '.join(command), self.shell, exit_code)
