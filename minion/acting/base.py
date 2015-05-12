@@ -37,7 +37,4 @@ class ShellCommandActuator(BaseActuator):
 
     def act(self, *args, **kwargs):
         command = self._build_command(*args, **kwargs)
-        logger.debug('$$$$$$$$$$$')
-        logger.debug(command)
-        logger.debug(self.shell)
         subprocess.call(command, shell=self.shell)
