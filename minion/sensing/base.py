@@ -54,9 +54,11 @@ class BaseSensor(minion.core.components.NervousComponent):
         self.post_process(data)
         return
 
-    # Publish channel override
-    # By defaut, leaves it to the nervous system to decide which channel messages are sent on
-    def _get_publish_channel(self):
+    def get_publish_channel(self):
+        """
+            Publish channel override
+            By defaut, leaves it to the nervous system to decide which channel messages are sent on
+        """
         return None
 
     def post_process(self, data):
@@ -66,7 +68,7 @@ class BaseSensor(minion.core.components.NervousComponent):
             data = p.process(data)
 
         # Use nervous system to pass on data
-        self.nervous_system.publish(channel=self._get_publish_channel(), message=data)
+        self.nervous_system.publish(channel=self.get_publish_channel(), message=data)
 
     def sense(self):
         raise NotImplementedError('Sense method needs to be implemented on sensor')

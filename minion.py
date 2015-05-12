@@ -44,29 +44,15 @@ if __name__ == '__main__':
     # Might raise NameConflict if two actuators have the same name
     my_minion.attach_actuators(*actuators_details)
 
+    # Start all the actuators
+    commands_details = settings.get('commands', [])
+
+    # Might raise NameConflict if two commands have the same name
+    my_minion.attach_commands(*commands_details)
+
     my_minion.loop()
     """logger = multiprocessing.get_logger()
-    
-    # Register all actuators
-    actuator_instances = []
-    for actuator_details in settings.get('actuators', []):
-        actuator_class = minion.utils.module_loading.import_string(actuator_details['class'])
 
-        # instantiate
-        actuator = actuator_class(**actuator_details)
-        actuator_instances.append(actuator)
-
-    # Register all commands
-    command_instances = []
-    for command in settings.get('commands', []):
-        command_class = minion.utils.module_loading.import_string(command['class'])
-        # instantiate
-        try:
-            command_instance = command_class(configuration=command.get('configuration', {}), name=command.get('name'))
-        except minion.understanding.errors.ImproperlyConfigured as e:
-            logger.error('Not adding command: %s', e)
-        else:
-            command_instances.append(command_instance)
 
     while True:
         for m in nervous_system.listen():

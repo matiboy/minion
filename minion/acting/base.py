@@ -1,5 +1,6 @@
 import minion.core.components
 import multiprocessing
+import subprocess
 
 logger = multiprocessing.get_logger()
 
@@ -17,3 +18,26 @@ class BaseActuator(minion.core.components.BaseComponent):
 
     def act(self, *args, **kwargs):
         raise NotImplementedError('Act needs to be implemented in actuator')
+
+
+class ShellCommandActuator(BaseActuator):
+    """
+        Actuator that will run a shell command using subprocess.
+        Child classes need to implement _build_command which receives the same args and kwargs as BaseActuator's act
+
+        Setting shell=True in child class is unsafe, see https://docs.python.org/2/library/subprocess.html#frequently-used-arguments
+    """
+    shell = False
+
+    def _build_command(self, *args, **kwargs):
+        """
+            Returns a string or an array that will be passed to subprocess
+        """
+        raise NotImplementedError('Shell command actuator needs to implement build command')
+
+    def act(self, *args, **kwargs):
+        command = self._build_command(*args, **kwargs)
+        logger.debug('$$$$$$$$$$$')
+        logger.debug(command)
+        logger.debug(self.shell)
+        subprocess.call(command, shell=self.shell)

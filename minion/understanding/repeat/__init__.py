@@ -11,7 +11,7 @@ class RepeatAfterMe(minion.understanding.base.BaseCommand):
     def _understand(self, original_command, *commands):
         # Doesn't expect multi
         command = commands[0]
-        return minion.understanding.base.UnderstandingCommand(self.configuration['action'], command)
+        return minion.understanding.base.UnderstandingCommand(self.get_command(), command)
 
 
 class AlwaysSaySomething(minion.understanding.base.BaseCommand):
@@ -22,13 +22,13 @@ class AlwaysSaySomething(minion.understanding.base.BaseCommand):
     }
 
     def _what_to_say(self, original_command, *commands):
-        return self.configuration['what']
+        return self.get_configuration('what')
 
     def _understand(self, original_command, *commands):
         what_to_say = self._what_to_say(original_command, *commands)
-        return minion.understanding.base.UnderstandingCommand(self.configuration['action'], what_to_say)
+        return minion.understanding.base.UnderstandingCommand(self.get_command(), what_to_say)
 
 
 class AlwaysSaySomethingRandom(AlwaysSaySomething):
     def _what_to_say(self, original_command, *commands):
-        return random.choice(self.configuration['choices'])
+        return random.choice(self.get_configuration('choices'))

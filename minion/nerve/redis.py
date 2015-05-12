@@ -28,10 +28,10 @@ class NervousSystem(base.BaseNervousSystem):
     # Publishing channel
     channel = 'minion:command'
 
-    def __init__(self, configuration={}, **kwargs):
-        super(NervousSystem, self).__init__(configuration)
+    def __init__(self, name, configuration, **kwargs):
+        super(NervousSystem, self).__init__(name, configuration)
 
-        self.redis_client = redis.StrictRedis(**self.configuration)
+        self.redis_client = redis.StrictRedis(**self._configuration)
 
         try:
             self.redis_client.ping()
@@ -39,19 +39,10 @@ class NervousSystem(base.BaseNervousSystem):
             logger.critical('Unable to connect nervous system to Redis')
             raise errors.ImproperlyConfigured
         else:
-            logger.info('Connection established to redis server {host}:{port} on db {db}'.format(**self.configuration))
+            logger.info('Connection established to redis server {host}:{port} on db {db}'.format(**self._configuration))
 
-        # Publishing channel
-        if 'channel' in self.configuration:
-            self.channel = self.configuration['channel']
-
-        # If we have channels, means we are listening
-        if 'channels' in kwargs:
-            self.subscribing_redis_client = redis.StrictRedis(**self.configuration)
-            self.channels = kwargs['channels']
-            self.pubsub = self.subscribing_redis_client.pubsub()
-            logger.info('Nervous system is now listening to channels %s', ', '.join(self.channels))
-            self.pubsub.subscribe(*self.channels)
+        # Publishing channel   found in config or default to class channel
+        self.channel = self.get_configuration('command_channel', self.channel)
 
     def publish(self, channel=None, message=''):
         if not channel:
@@ -66,3 +57,10 @@ class NervousSystem(base.BaseNervousSystem):
         messages_only = itertools.ifilter(remove_non_messages, from_redis)
         # Map to message objects
         return itertools.imap(make_message_object, messages_only)
+
+    def subscribe(self, *channels):
+        logger.debug(channels)
+        subscribing_redis_client = redis.StrictRedis(**self._configuration)
+        self.pubsub = subscribing_redis_client.pubsub()
+        self.pubsub.subscribe(*channels)
+        logger.info('Nervous system is now listening to channels %s', ', '.join(channels))

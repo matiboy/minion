@@ -1,6 +1,7 @@
 import re
 import multiprocessing
-from . import errors
+import minion.core.components
+import minion.core.components.exceptions
 
 logger = multiprocessing.get_logger()
 
@@ -34,29 +35,20 @@ class Noop(object):
         raise StopIteration
 
 
-class BaseCommand(object):
+class BaseCommand(minion.core.components.BaseComponent):
     configuration = {
         'action': 'noop',
         'expressions': []
     }
     multi = False
 
-    def __init__(self, configuration={}, name=''):
-        self.configuration = self.configuration.copy()
-        self.configuration.update(configuration)
-        self.name = name
-        try:
-            self._validate_configuration()
-        except errors.ImproperlyConfigured as e:
-            raise errors.ImproperlyConfigured('Command <{}> is improperly configured: {}'.format(self, e))
-
-        logger.info('Registering command with configuration %s', self.configuration)
+    def __init__(self, name, configuration):
+        super(BaseCommand, self).__init__(name, configuration)
+        logger.info('Registering command <%s> with configuration %s.', self.name, self._configuration)
+        # TODO Add prefix
         # Parse regular expressions
-        self.expressions = [re.compile(exp) for exp in self.configuration['expressions']]
+        self.expressions = [re.compile(exp) for exp in self.get_configuration('expressions')]
         logger.info('Command <%s> will respond to the following expressions: %s', self.name, self.expressions)
-
-    def _validate_configuration(self):
-        return
 
     def understand(self, nervous_system, original_command, *commands):
         actions = self._understand(original_command, *commands)
@@ -71,6 +63,9 @@ class BaseCommand(object):
     def is_blocking_command(self):
         return False
 
+    def get_command(self):
+        return self.get_configuration('action')
+
     def matches(self, command):
         commands = []
         for regular_expression in self.expressions:
@@ -84,6 +79,38 @@ class BaseCommand(object):
 
     def __str__(self):
         return self.name or self.__class__.__name__
+
+
+class ParsedResultCommand(BaseCommand):
+    """
+        A command that parses the results before attempting to decide on actions
+    """
+    def __init__(self, name, configuration):
+        super(ParsedResultCommand, self).__init__(name, configuration)
+        # Regexp flags
+        try:
+            flags = [getattr(re, x) for x in self.get_configuration('flags', [])]
+        except AttributeError as e:
+            raise minion.core.components.exceptions.ImproperlyConfigured('Invalid flag: {}'.format(e))
+
+        try:
+            reg_exp = self.get_configuration('regular_expression') or self.regular_expression
+            self.regular_expression = re.compile(reg_exp, *flags)
+        except AttributeError:
+            # Will happen if regular expression config was left empty, and the class did not define a regex
+            raise minion.core.components.exceptions.ImproperlyConfigured('Parsed result command requires either the class or the configuration to define a regular expression')
+        except re.error as e:
+            raise minion.core.components.exceptions.ImproperlyConfigured('Parsed result command regular expression is invalid: {}'.format(e))
+
+    def _match_command(self, command):
+        matches = re.match(self.regular_expression, command)
+        if matches is None:
+            return None
+
+        return matches.groupdict()
+
+    def _understand(self, original_command, *commands):
+        return (self._match_command(command) for command in commands)
 
 
 class BlockingCommand(BaseCommand):

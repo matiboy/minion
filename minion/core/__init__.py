@@ -3,6 +3,8 @@ import minion.utils.module_loading
 import multiprocessing
 import time
 
+logger = multiprocessing.get_logger()
+
 
 class Minion(object):
     loop_period = 0.1
@@ -51,22 +53,77 @@ class Minion(object):
         for name, object_class, object_details in classes:
             if name in self.actuators:
                 raise exceptions.NameConflict('Actuator name <%s> is already in use', name)
-            print object_details
+
             actuator = object_class(name, **object_details)
 
             self.actuators[name] = actuator
 
     def attach_commands(self, *commands):
-        return self._attach('commands', False, *commands)
+        classes = self._get_classes(*commands)
+        for name, object_class, object_details in classes:
+            if name in self.commands:
+                raise exceptions.NameConflict('Command name <%s> is already in use', name)
+
+            command = object_class(name, object_details['configuration'])
+
+            self.commands[name] = command
+
+    def _gather_channels(self):
+        publish_channels = set()
+        # Nervous system publishing command
+        publish_channels.add(self.nervous_system.channel)
+
+        # Gather from sensors
+        for sensor in self.get_sensors():
+            sensor_channel = sensor.get_publish_channel()
+            if sensor_channel is not None:
+                publish_channels.add(sensor_channel)
+
+        actuator_channels = set()
+        for actuator in self.get_actuators():
+            actuator_channels.update(actuator.channels)
+
+        return publish_channels, actuator_channels
+
+    def get_sensors(self):
+        return self.sensors.values()
+
+    def get_commands(self):
+        return self.commands.values()
+
+    def get_actuators(self):
+        return self.actuators.values()
 
     def loop(self):
         # Gather channels that nervous system needs to listen on
-        # TODO
+        command_channels, actuator_channels = self._gather_channels()
+        all_channels = command_channels.union(actuator_channels)
+        # Tell the nervous system to subscribe to these channels
+        self.nervous_system.subscribe(*all_channels)
 
         for sensor_name, sensor in self.sensors.iteritems():
             p = multiprocessing.Process(name=sensor_name, target=sensor.run)
             p.start()
 
         while True:
+            for m in self.nervous_system.listen():
+                logger.debug('Command received: %s', m)
+                command = m.get_message()
+                channel = m.get_channel()
+
+                # Differentiate between command/action channels
+                if channel in command_channels:
+                    for c in self.get_commands():
+                        command_matches = c.matches(command)
+                        if command_matches:
+                            logger.debug('Command <%s> can handle command %s', c, command)
+                            c.understand(self.nervous_system, command, *command_matches.groups())
+
+                elif channel in actuator_channels:
+                    for actuator in self.get_actuators():
+                        if actuator.can_handle(m.get_channel()):
+                            actuator.act(m.get_message())
+                else:
+                    logger.info('Message got lost in translation: %s', m)
 
             time.sleep(self.loop_period)

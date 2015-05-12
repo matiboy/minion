@@ -2,19 +2,9 @@ from __future__ import absolute_import
 import minion.acting.base
 import multiprocessing
 import pyglet
-import time
-import threading
-import sys
 
 logger = multiprocessing.get_logger()
 
-def blop(f):
-    player = pyglet.media.ManagedSoundPlayer()
-    sound = pyglet.media.load(f, streaming=False)
-    player.queue(sound)
-    t = threading.Thread(target=player.play)
-    t.start()
-    t.join()
 
 class PygletPlayer(minion.acting.base.BaseActuator):
     def __init__(self, name, configuration, channels=[], **kwargs):

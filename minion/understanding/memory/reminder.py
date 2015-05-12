@@ -13,8 +13,10 @@ def _parse(to_be_parsed):
     exp = re.compile('(?P<numbers>.+)\s+(?P<unit>minutes?|seconds?|days?|weeks?)\s+(?P<what>.+)')
     return exp.match(to_be_parsed)
 
+
 def _timestamp(numbers, unit):
     return _date_shift(numbers, unit).timestamp
+
 
 def _date_shift(numbers, unit):
     now = arrow.utcnow()
@@ -47,12 +49,15 @@ class RemindMe(minion.understanding.base.BaseCommand):
 
         # Create redis client
         self.redis_client = redis.StrictRedis(**self.configuration['redis'])
-        self.key = self.configuration['key']
+        self.key = self.get_key()
+
+    def get_key(self):
+        return self.get_configuration('key')
 
     def _validate_configuration(self):
         # Fail if not set or empty
-        if not self.configuration.get('key'):
-            raise minion.understanding.errors.ImproperlyConfigured('Key is required')
+        if not self.get_key():
+            raise minion.core.components.exceptions.ImproperlyConfigured('Key is required')
 
     def _understand(self, original_command, *commands):
         command = commands[0]

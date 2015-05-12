@@ -35,7 +35,7 @@ class BaseNervousSystem(minion.core.components.BaseComponent):
 
     def __init__(self, name, configuration={}, **kwargs):
         super(BaseNervousSystem, self).__init__(name, configuration)
-        logger.info('Starting Nervous system <%s> with configuration %s', self.name, self.configuration)
+        logger.info('Starting Nervous system <%s> with configuration %s', self.name, self._configuration)
 
     def listen(self):
         raise NotImplementedError

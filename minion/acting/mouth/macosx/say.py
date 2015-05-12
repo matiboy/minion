@@ -1,17 +1,18 @@
 import minion.acting.base
 import multiprocessing
-import subprocess
 import threading
 
 logger = multiprocessing.get_logger()
 
-def say_it(self, *args):
-    voice = ''
-    if 'voice' in self.configuration:
-        voice = ' -v "{}" '.format(self.configuration['voice'])
-    subprocess.call('say {voice} {what_to_say}'.format(what_to_say=args[0], voice=voice), shell=True)
 
-class SimpleSay(minion.acting.base.BaseActuator):
+class SimpleSay(minion.acting.base.ShellCommandActuator):
+    def _build_command(self, *args, **kwargs):
+        # TODO This is rather ugly
+        voice = self.get_configuration('voice', [])
+        if voice.__len__():
+            voice = ['-v', voice]
+            return ['say'] + voice + [args[0]]
+
     def act(self, *args, **kwargs):
-        t = threading.Thread(target=say_it, args=(self,)+args)
+        t = threading.Thread(target=super(SimpleSay, self).act, args=args)
         t.start()
