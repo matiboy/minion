@@ -1,4 +1,5 @@
 import minion.understanding.base
+import minion.understanding.operations
 import arrow
 from dateutil import tz
 
@@ -11,7 +12,6 @@ class GiveMeTheTime(minion.understanding.base.BaseCommand):
     }
 
     def _understand(self, original_command, *commands):
-        # Doesn't expect multi
         time = arrow.get(tz.tzlocal())
 
-        return minion.understanding.base.UnderstandingCommand(self.configuration['action'], time.format(self.configuration['time_format']))
+        return minion.understanding.operations.UnderstandingOperation(self.get_configuration('action'), time.format(self.get_configuration('time_format')))

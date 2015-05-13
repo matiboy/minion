@@ -47,6 +47,35 @@ class MicrophoneSelectiveListener(MicrophoneListener):
     period = 0.1
 
     def _update_configuration(self, configuration):
+        """
+            Extends default configuration update function
+            For readability purposes, configuration of silence values is set as an object as seen below
+            ```
+                "configuration": {
+                    "format": "wav",
+                    "silence": {
+                        "pre": {
+                            "level": "10%",
+                            "trim": 1,
+                            "duration": 0.05
+                        },
+                        "post": {
+                            "level": "10%",
+                            "trim": 1,
+                            "duration": 0.8
+                        }
+                    }
+                }
+            ```
+            Also the "options" object will be converted to a string e.g.
+            ```
+            {
+                "c": 1,
+                "d": 16
+            }
+            ```
+            will become "-c 1 -d 16"
+        """
         super(MicrophoneSelectiveListener, self)._update_configuration(configuration)
         options = ['-{} {}'.format(key, value) for key, value in self.get_configuration('options', {}).iteritems()]
         self._configuration['options'] = ' '.join(options)

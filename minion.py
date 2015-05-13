@@ -1,14 +1,11 @@
 import json
-import minion.utils.module_loading
+import minion.core.utils.module_loading
 import minion.understanding.errors
 import minion.core
 import minion.core.components.exceptions
 import os
 import multiprocessing
 import logging
-import time
-import threading
-import sys
 
 
 if __name__ == '__main__':
@@ -51,26 +48,3 @@ if __name__ == '__main__':
     my_minion.attach_commands(*commands_details)
 
     my_minion.loop()
-    """logger = multiprocessing.get_logger()
-
-
-    while True:
-        for m in nervous_system.listen():
-            logger.debug('Command received: %s', m)
-            command = m.get_message()
-
-            # TODO Differentiate between command/action channels
-            if m.get_channel() == 'minion:command':
-                for c in command_instances:
-                    command_matches = c.matches(command)
-                    if command_matches:
-                        logger.debug('Command <%s> can handle command %s', c, command)
-                        c.understand(nervous_system, command, *command_matches.groups())
-
-            else:
-                for actuator in actuator_instances:
-                    if actuator.can_handle(m.get_channel()):
-                        actuator.act(m.get_message())      
-
-        time.sleep(settings.get('delay', 0.01))
-    """

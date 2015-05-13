@@ -2,37 +2,9 @@ import re
 import multiprocessing
 import minion.core.components
 import minion.core.components.exceptions
+import threading
 
 logger = multiprocessing.get_logger()
-
-
-class UnderstandingCommand(object):
-    used = False
-
-    def __init__(self, action, message):
-        self.action = action
-        self.message = message
-
-    def __iter__(self):
-        return self
-
-    def next(self):
-        if not self.used:
-            self.used = True
-            return self
-
-        raise StopIteration
-
-    def publish(self, nervous_system):
-        nervous_system.publish(self.action, self.message)
-
-
-class Noop(object):
-    def __iter__(self):
-        return self
-
-    def next(self):
-        raise StopIteration
 
 
 class BaseCommand(minion.core.components.BaseComponent):
@@ -41,21 +13,22 @@ class BaseCommand(minion.core.components.BaseComponent):
         'expressions': []
     }
     multi = False
+    threaded = False
 
     def __init__(self, name, configuration):
         super(BaseCommand, self).__init__(name, configuration)
         logger.info('Registering command <%s> with configuration %s.', self.name, self._configuration)
         # TODO Add prefix
         # Parse regular expressions
-        self.expressions = [re.compile(exp) for exp in self.get_configuration('expressions')]
-        logger.info('Command <%s> will respond to the following expressions: %s', self.name, self.expressions)
+        self.expressions = [re.compile(exp) for exp in self.get_configuration('expressions', [])]
+        if self.threaded:
+            self.understand_runner = ThreadedUnderstandRunner()
+        else:
+            self.understand_runner = UnderstandRunner()
+        logger.info('Command <%s> will respond to the following expressions: %s', self.name, ', '.join(map(lambda x: x.pattern, self.expressions)))
 
     def understand(self, nervous_system, original_command, *commands):
-        actions = self._understand(original_command, *commands)
-        logger.debug(actions)
-        for action in actions:
-            logger.debug(action)
-            action.publish(nervous_system)
+        self.understand_runner.run(self, nervous_system, original_command, *commands)
 
     def _understand(self, original_command, *commands):
         raise NotImplementedError('"Understand" method must be implemented in command')
@@ -100,10 +73,11 @@ class ParsedResultCommand(BaseCommand):
             # Will happen if regular expression config was left empty, and the class did not define a regex
             raise minion.core.components.exceptions.ImproperlyConfigured('Parsed result command requires either the class or the configuration to define a regular expression')
         except re.error as e:
+            # Happens if the regular expression is somehow invalid
             raise minion.core.components.exceptions.ImproperlyConfigured('Parsed result command regular expression is invalid: {}'.format(e))
 
     def _match_command(self, command):
-        matches = re.match(self.regular_expression, command)
+        matches = re.search(self.regular_expression, command)
         if matches is None:
             return None
 
@@ -113,7 +87,17 @@ class ParsedResultCommand(BaseCommand):
         return (self._match_command(command) for command in commands)
 
 
-class BlockingCommand(BaseCommand):
+class UnderstandRunner(object):
+    def run(self, command_object, nervous_system, original_command, *commands):
+        actions = command_object._understand(original_command, *commands)
+        for action in actions:
+            action.publish(nervous_system)
 
-    def is_blocking_command(self):
-        return True
+
+class ThreadedUnderstandRunner(UnderstandRunner):
+    """
+    Calls the same exactly, but threaded
+    """
+    def run(self, *args):
+        t = threading.Thread(target=super(ThreadedUnderstandRunner, self).run, args=args)
+        t.start()

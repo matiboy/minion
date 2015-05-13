@@ -6,6 +6,10 @@ logger = multiprocessing.get_logger()
 
 
 class BaseActuator(minion.core.components.BaseComponent):
+    """
+        Base actuator class
+        Sub classes need to implement the "act" method
+    """
     configuration = {}
 
     def __init__(self, name, configuration, channels=[], **kwargs):

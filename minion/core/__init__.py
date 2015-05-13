@@ -1,5 +1,5 @@
 from .components import exceptions
-import minion.utils.module_loading
+import minion.core.utils.module_loading
 import multiprocessing
 import time
 
@@ -18,7 +18,7 @@ class Minion(object):
         if 'name' not in configuration:
             raise exceptions.ImproperlyConfigured('Name is required for nervous system')
 
-        nervous_system_class = minion.utils.module_loading.import_string(configuration['class'])
+        nervous_system_class = minion.core.utils.module_loading.import_string(configuration['class'])
         self.nervous_system = nervous_system_class(**configuration)
 
     def _get_classes(self, *objects):
@@ -29,7 +29,7 @@ class Minion(object):
             # Remove so it doesn't cause problems in kwargs
             # FIXME there has to be a cleaner way
             del object_details['name']
-            object_class = minion.utils.module_loading.import_string(object_details['class'])
+            object_class = minion.core.utils.module_loading.import_string(object_details['class'])
             del object_details['class']
             if 'configuration' not in object_details:
                 object_details['configuration'] = {}

@@ -1,54 +1,37 @@
 import minion.understanding.base
+import minion.understanding.operations
 import minion.understanding.errors
-import minion.utils.words_to_numbers
+import minion.core.utils.words_to_numbers
+import minion.core.utils.date
 import multiprocessing
 import redis
-import re
-import arrow
 
 logger = multiprocessing.get_logger()
 
 
-def _parse(to_be_parsed):
-    exp = re.compile('(?P<numbers>.+)\s+(?P<unit>minutes?|seconds?|days?|weeks?)\s+(?P<what>.+)')
-    return exp.match(to_be_parsed)
-
-
 def _timestamp(numbers, unit):
-    return _date_shift(numbers, unit).timestamp
+    return minion.core.utils.date.date_shift(numbers, unit).timestamp
 
 
-def _date_shift(numbers, unit):
-    now = arrow.utcnow()
-
-    if unit[-1] != 's':
-        unit = unit + 's'
-
-    kwargs = {
-        unit: minion.utils.words_to_numbers.text2int( numbers )
-    }
-
-    after_shift = now.replace(**kwargs)
-
-    return after_shift
-
-
-class RemindMe(minion.understanding.base.BaseCommand):
+class RemindMe(minion.understanding.base.ParsedResultCommand):
     configuration = {
         'redis': {
             'host': 'localhost',
             'port': 6379,
             'db': 0
         },
-        'expressions': [r'^remind me in (?P<to_be_parsed>.*)'],
-        'future_command': 'say you asked me to remind you {}'
+        'expressions': ['^remind me in (?P<to_be_parsed>.*)'],
+        'future_command': 'say you asked me to remind you {}',
+        'confirmation_command': 'say sure, i will remind you in {numbers} {unit} {what}'
     }
+
+    regular_expression = '(?P<numbers>.+)\s+(?P<unit>minutes?|seconds?|days?|weeks?)\s+(?P<what>.+)'
 
     def __init__(self, configuration={}, name=''):
         super(RemindMe, self).__init__(configuration, name)
 
         # Create redis client
-        self.redis_client = redis.StrictRedis(**self.configuration['redis'])
+        self.redis_client = redis.StrictRedis(**self.get_configuration('redis'))
         self.key = self.get_key()
 
     def get_key(self):
@@ -60,17 +43,22 @@ class RemindMe(minion.understanding.base.BaseCommand):
             raise minion.core.components.exceptions.ImproperlyConfigured('Key is required')
 
     def _understand(self, original_command, *commands):
-        command = commands[0]
-        logger.debug(command)
-        matches = _parse(command)
-        logger.debug(matches)
-        if matches:
-            as_dict = matches.groupdict()
-
+        commands = super(RemindMe, self)._understand(original_command, *commands)
+        exec_commands = []
+        for as_dict in commands:
             # TODO Errors
-            score = _timestamp(as_dict['numbers'], as_dict['unit'])
+            try:
+                score = _timestamp(as_dict['numbers'], as_dict['unit'])
+            except KeyError:
+                logger.error('Unable to read expected data from %s', as_dict)
+            else:
+                # Confirm
+                confirm = self.get_configuration('confirmation_command')
+                if confirm:
+                    exec_commands.append(minion.understanding.operations.UnderstandingOperation(None, confirm.format(**as_dict)))
+                # TODO serializing?
+                self.redis_client.zadd(self.key, score, self.get_configuration('future_command').format(as_dict['what']))
 
-            # TODO serializing
-            self.redis_client.zadd(self.key, score, self.configuration['future_command'].format(as_dict['what']))
-
-        return minion.understanding.base.Noop()
+        if exec_commands.__len__():
+            return exec_commands
+        return minion.understanding.operations.Noop()

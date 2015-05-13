@@ -2,7 +2,7 @@ from . import exceptions
 import time
 import multiprocessing
 import minion.core.components
-import minion.utils.module_loading
+import minion.core.utils.module_loading
 import threading
 
 logger = multiprocessing.get_logger()
@@ -17,7 +17,7 @@ class BaseSensor(minion.core.components.NervousComponent):
         processors = []
         for p in postprocessors:
             try:
-                c = minion.utils.module_loading.import_string(p['class'])
+                c = minion.core.utils.module_loading.import_string(p['class'])
             except ImportError:
                 logger.critical('Unable to import {}'.format(p['class']))
             else:
