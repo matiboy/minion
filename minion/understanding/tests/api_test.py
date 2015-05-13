@@ -3,7 +3,7 @@ from .. import api
 import mock
 import minion.core.components.exceptions
 import requests
-import sure
+import sure # though lint complains that it's never used this is needed
 
 known_data = 'http://jsonplaceholder.typicode.com/users'
 
@@ -60,3 +60,9 @@ class JsonParser(unittest.TestCase):
         parsed = parser.parse(self.response)
         parsed.should.be.a('list')
         parsed.should.have.length_of(1)
+
+    def test_parses_data_according_to_json_path2(self):
+        """Parses correctly 2"""
+        parser = api.JsonParser('$[1].company.bs')
+        parsed = parser.parse(self.response)[0]
+        parsed.should.be.equal('synergize scalable supply-chains')

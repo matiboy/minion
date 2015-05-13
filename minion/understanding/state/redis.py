@@ -7,7 +7,7 @@ class RedisState(base.BaseState):
         'host': 'localhost',
         'port': 6379,
         'db': 0,
-        'name': 'something'
+        'name': 'something',
         'expressions': ['set {name} to ']
     }
 
