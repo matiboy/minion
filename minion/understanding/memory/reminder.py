@@ -1,6 +1,5 @@
 import minion.understanding.base
 import minion.understanding.operations
-import minion.understanding.errors
 import minion.core.utils.words_to_numbers
 import minion.core.utils.date
 import multiprocessing
@@ -21,7 +20,7 @@ class RemindMe(minion.understanding.base.ParsedResultCommand):
             'db': 0
         },
         'expressions': ['^remind me in (?P<to_be_parsed>.*)'],
-        'future_command': 'say you asked me to remind you {}',
+        'future_command': 'say you asked me to remind you {what}',
         'confirmation_command': 'say sure, i will remind you in {numbers} {unit} {what}'
     }
 
@@ -51,13 +50,16 @@ class RemindMe(minion.understanding.base.ParsedResultCommand):
                 score = _timestamp(as_dict['numbers'], as_dict['unit'])
             except KeyError:
                 logger.error('Unable to read expected data from %s', as_dict)
+            except minion.core.utils.words_to_numbers.IllegalWordException:
+                # Refer to minion.core.utils.words_to_numbers for list
+                logger.error('Numbers do not appear to be valid')
             else:
                 # Confirm
                 confirm = self.get_configuration('confirmation_command')
                 if confirm:
                     exec_commands.append(minion.understanding.operations.UnderstandingOperation(None, confirm.format(**as_dict)))
                 # TODO serializing?
-                self.redis_client.zadd(self.key, score, self.get_configuration('future_command').format(as_dict['what']))
+                self.redis_client.zadd(self.key, score, self.get_configuration('future_command').format(**as_dict))
 
         if exec_commands.__len__():
             return exec_commands

@@ -21,7 +21,7 @@ class BaseSensor(minion.core.components.NervousComponent):
             except ImportError:
                 logger.critical('Unable to import {}'.format(p['class']))
             else:
-                processors.append(c(configuration=p.get('configuration', {})))
+                processors.append(c(p.get('name', ''), configuration=p.get('configuration', {})))
 
         self.postprocessors = processors
 

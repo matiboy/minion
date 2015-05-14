@@ -53,6 +53,9 @@ class APICommand(base.BaseCommand):
         response = method(api_call, **kwargs)
         results = self.parser.parse(response)
 
+        if results is not None:
+            return self._handle_no_results
+
         # Post process results if need be
         results = self._post_process(results)
 
@@ -60,6 +63,9 @@ class APICommand(base.BaseCommand):
 
     def _post_process(self, results):
         return results
+
+    def _handle_no_results(self):
+        return None
 
 class JsonAPICommand(APICommand):
     def __init__(self, name, configuration):

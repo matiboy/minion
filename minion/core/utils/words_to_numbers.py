@@ -1,3 +1,7 @@
+class IllegalWordException(Exception):
+    """Numbers couldn't be parsed"""
+    pass
+
 def text2int(textnum, numwords={}):
     if not numwords:
         units = [
@@ -18,7 +22,7 @@ def text2int(textnum, numwords={}):
     current = result = 0
     for word in textnum.split():
         if word not in numwords:
-            raise Exception("Illegal word: " + word)
+            raise IllegalWordException("Illegal word: " + word)
 
         scale, increment = numwords[word]
         current = current * scale + increment

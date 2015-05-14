@@ -1,12 +1,12 @@
 import subprocess
 import tempfile
-import minion.postprocessors
+import minion.sensing.postprocessors
 import multiprocessing
 
 logger = multiprocessing.get_logger()
 
 
-class Convert(minion.postprocessors.BasePostprocessor):
+class Convert(minion.sensing.postprocessors.BasePostprocessor):
     configuration = {
         'format': 'wav'
     }
