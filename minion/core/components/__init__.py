@@ -2,6 +2,15 @@ from . import class_validation
 from . import exceptions
 
 
+class Types():
+    ACTUATOR = 'actuator'
+    COMMAND = 'command'
+    NERVOUS_SYSTEM = 'nerve'
+    PRE_PROCESSOR = 'pre_processor'
+    POST_PROCESSOR = 'post_processor'
+    SENSOR = 'sensor'
+
+
 class BaseComponent(object):
     configuration = {}
 

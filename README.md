@@ -24,7 +24,11 @@ Minion works similar to a minion (or a human), it requires 4 components to funct
 
 ### Clone the repo
 
-Very soon, Minion will be available to install via `pip` but for now, simply clone the repo `git clone https://github.com/matiboy/minion.git`
+Very soon, Minion will be available to install via `pip` but for now, simply clone the repo 
+
+```
+  $ git clone https://github.com/matiboy/minion.git
+```
 
 ### Install requirements
 

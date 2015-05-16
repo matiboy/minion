@@ -49,7 +49,7 @@ class MicrophoneSelectiveListener(MicrophoneListener):
     def _update_configuration(self, configuration):
         """
             Extends default configuration update function
-            For readability purposes, configuration of silence values is set as an object as seen below
+            For readability purposes, configuration of silence values can set as an object as seen below
             ```
                 "configuration": {
                     "format": "wav",
