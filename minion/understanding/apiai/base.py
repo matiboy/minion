@@ -1,5 +1,8 @@
 import json
 import minion.understanding.base
+import multiprocessing
+
+logger = multiprocessing.get_logger()
 
 
 class ApiaiBaseCommand(minion.understanding.base.BaseCommand):
@@ -19,8 +22,12 @@ class ApiaiBaseCommand(minion.understanding.base.BaseCommand):
         try:
             command = json.loads(command)
             action = command['action']
-        except (ValueError, KeyError):
-            return False
+        except (ValueError, KeyError) as e:
+            logger.debug(e)
+            return None
 
         # Check if this command understands said action
-        return action in self.actions
+        if action in self.actions:
+            return [action, command.get('parameters', {}), command.get('fulfillment', '')]
+
+        return None
