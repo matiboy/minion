@@ -114,10 +114,10 @@ class Minion(object):
                 # Differentiate between command/action channels
                 if channel in command_channels:
                     for c in self.get_commands():
-                        command_matches = c.matches(command)
-                        if command_matches:
+                        command_details = c.matches(command)
+                        if command_details:
                             logger.debug('Command <%s> can handle command %s', c, command)
-                            c.understand(self.nervous_system, command, *command_matches.groups())
+                            c.understand(self.nervous_system, command, *command_details)
 
                 elif channel in actuator_channels:
                     for actuator in self.get_actuators():

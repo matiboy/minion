@@ -32,7 +32,11 @@ Very soon, Minion will be available to install via `pip` but for now, simply clo
 
 ### Install requirements
 
-Use `pip install -r requirements.txt` to install all requirements.
+Install basic requirements using the command
+
+```
+  $ pip install -r requirements.txt
+```
 
 In the near future, modules will be independent so that you will only go through the hassle of installing e.g. `sox` if you are using the `SelectiveMicrophoneListener` but for now hopefully you don't run into too many installation issues.
 

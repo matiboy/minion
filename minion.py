@@ -82,11 +82,13 @@ def main(argv):
     options = docopt(__doc__)
 
     # By default log only info
-    multiprocessing.log_to_stderr(logging.INFO)
+    level = logging.INFO
 
     if options['--debug']:
         minion.core.utils.console.console_warn('Logging level set to DEBUG')
-        multiprocessing.log_to_stderr(logging.DEBUG)
+        level = logging.DEBUG
+
+    multiprocessing.log_to_stderr(level)
 
     if options['--version']:
         minion.core.utils.console.console_success('0.1.0')

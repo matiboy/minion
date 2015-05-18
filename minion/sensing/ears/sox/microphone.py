@@ -15,10 +15,14 @@ class MicrophoneListener(minion.sensing.base.ContinuousSensor):
     }
 
     def _get_tempfile_suffix(self):
-        return '.{}'.format(self.configuration['format'])
+        return '.{}'.format(self.get_configuration('format'))
 
     def sense(self):
-        with tempfile.NamedTemporaryFile(suffix=self._get_tempfile_suffix()) as audio_temporary_file:
+        delete_file = self.get_configuration('delete_audio_file', True)
+        with tempfile.NamedTemporaryFile(suffix=self._get_tempfile_suffix(), delete=delete_file) as audio_temporary_file:
+            logger.debug(audio_temporary_file.name)
+            if not delete_file:
+                logger.debug('File will be kept: %s', audio_temporary_file.name)
             logger.debug(audio_temporary_file.name)
             subprocess.call(self._build_sox_command(audio_temporary_file), shell=True)
             audio_data = audio_temporary_file.read()

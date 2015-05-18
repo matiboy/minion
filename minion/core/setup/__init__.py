@@ -11,6 +11,7 @@ import pip
 import pkgutil
 import sys
 
+
 class QuestionCancelled(Exception):
     pass
 
@@ -32,6 +33,7 @@ modules = {
     minion.core.components.Types.PRE_PROCESSOR: [],
     minion.core.components.Types.SENSOR: [],
 }
+
 
 def noop(*args):
     pass
@@ -169,6 +171,7 @@ def add_or_remove(settings, key):
             return 1
     return None
 
+
 def amend_actuators(settings, isnew):
     actuator_settings = settings.get('actuators', [])
 
@@ -230,7 +233,7 @@ def amend_sensors(settings, isnew):
     except QuestionCancelled:
         return 1
 
-    actuator_settings.append(added_component_settings)
+    sensor_settings.append(added_component_settings)
 
     # Install required python packages
     install_requirements(sensor)

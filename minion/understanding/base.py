@@ -45,9 +45,9 @@ class BaseCommand(minion.core.components.BaseComponent):
             m = regular_expression.match(command)
             if m:
                 if self.multi:
-                    commands.append(m)
+                    commands.append(m.groups())
                 else:
-                    return m
+                    return m.groups()
         return commands
 
     def __str__(self):
