@@ -78,7 +78,7 @@ def run(settings):
 
 
 def main(argv):
-    settings = os.getenv('MINION_SETTINGS', 'settings.json')
+    settings = os.getenv('MINION_SETTINGS', 'minion.json')
     options = docopt(__doc__)
 
     # By default log only info

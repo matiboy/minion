@@ -1,4 +1,3 @@
-import inquirer
 import minion.core.components
 
 defines = {
@@ -6,9 +5,31 @@ defines = {
         {
             'name': 'Redis',
             'class': 'minion.nerve.redis.redis.NervousSystem',
-            'questions': [
-                inquirer.Text('host', message='Select Redis host', default='localhost'),
-                inquirer.Text('port', message='Select Redis port', default='6379')
+            'description': '''
+# Redis based nervous system.
+#
+# Fast event based system.
+# Set up host, port and db according to your environment
+            ''',
+            'setup': [
+                {
+                    'name': 'host',
+                    'default': 'localhost',
+                    'type': 'input',
+                    'message': 'Select Redis host'
+                },
+                {
+                    'name': 'port',
+                    'default': '6379',
+                    'type': 'input',
+                    'message': 'Select Redis port'
+                },
+                {
+                    'name': 'db',
+                    'default': '0',
+                    'type': 'input',
+                    'message': 'Select Redis db'
+                }
             ],
             'requirements': (
                 'redis',

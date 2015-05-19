@@ -32,8 +32,11 @@ class ActionParser(SimpleParser):
         if not action:
             # Could be fulfillment
             fulfillment = result.get('fulfillment', '')
-            if fulfillment:
-                return 'apiai:fulfillment|{}'.format(fulfillment)
+            if fulfillment and fulfillment.get('speech', ''):
+                return json.dumps({
+                    'action': 'apiai:fulfillment',
+                    'fulfillment': fulfillment['speech']
+                })
 
             # Just normal STT
             return super(ActionParser, self).parse(data)

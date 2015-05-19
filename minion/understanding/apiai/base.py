@@ -9,7 +9,8 @@ class ApiaiBaseCommand(minion.understanding.base.BaseCommand):
     configuration = {
         'host': 'localhost',
         'db': 0,
-        'port': ''
+        'port': '',
+        'acknowledge': True
     }
 
     def __init__(self, name, configuration):
