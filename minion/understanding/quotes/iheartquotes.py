@@ -12,7 +12,7 @@ class RandomQuote(minion.understanding.api.JsonAPICommand):
         'url': URL,
         'method': 'get',
         'json_path': '$.quote',
-        'expressions': 'quote',
+        'expressions': ['quote'],
         'action': 'minion:speak'
     }
 

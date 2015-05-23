@@ -29,7 +29,7 @@ class ActionParser(SimpleParser):
 
         action = result.get('action', '')
 
-        if not action or '.unknown' in action:
+        if not action:
             # Could be fulfillment
             fulfillment = result.get('fulfillment', '')
             if fulfillment and fulfillment.get('speech', ''):
@@ -55,9 +55,9 @@ PARSERS = {
 }
 
 
-class ApiaiSpeechToText(minion.sensing.postprocessors.BasePostprocessor):
+class ApiaiText(minion.sensing.postprocessors.BasePostprocessor):
     def __init__(self, name, configuration={}):
-        super(ApiaiSpeechToText, self).__init__(name, configuration)
+        super(ApiaiText, self).__init__(name, configuration)
         self.CLIENT_ACCESS_TOKEN = self.get_configuration('CLIENT_ACCESS_TOKEN')
         self.SUBSCRIBTION_KEY = self.get_configuration('SUBSCRIBTION_KEY')
 
@@ -73,13 +73,17 @@ class ApiaiSpeechToText(minion.sensing.postprocessors.BasePostprocessor):
             raise minion.core.components.exceptions.ImproperlyConfigured('SUBSCRIBTION_KEY is required for Apiai')
 
     def process(self, data):
-        request = self.ai.voice_request()
-        request.send(data)
+        request = self.ai.text_request()
+        print 'DATADATA', data
+        request.query = data
 
         response = request.getresponse()
 
         try:
-            data = json.loads(response.read())
+            resp = response.read()
+            print resp
+            data = json.loads(resp)
+            print data
             logger.debug(data)
             return self.parser.parse(data)
         except (ValueError, UnableToParse):

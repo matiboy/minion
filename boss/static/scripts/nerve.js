@@ -15,9 +15,12 @@ angular.module('Boss', [])
         $scope.systems = currentSystems;
 
         $scope.submit = function() {
-            $scope.nerve.configuration = currentSystems[$scope.nerve.class];
-            $http.post('/save_nerve', {
-                data: $scope.nerve
-            }).finally(console.debug.bind(console));
+            $scope.nerve.configuration = currentSystems[$scope.nerve.class].configuration;
+            $http.post('/save_nerve', $scope.nerve)
+                .then(function(resp){
+                    console.debug(resp);
+                    window.alert('Nervous system saved successfully');
+                })
+                .finally(console.debug.bind(console));
         };
     });

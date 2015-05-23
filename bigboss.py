@@ -28,6 +28,14 @@ def dashboard():
     )
 
 
+@simple_page.route('/save_nerve', methods=['POST'])
+@boss.utils.auth.requires_auth
+def save_nerve():
+    setup = flask.request.get_json()
+    boss.settings.save('nerve', setup)
+
+    return flask.jsonify(status=0)
+
 @simple_page.route('/nerve')
 @boss.utils.auth.requires_auth
 def nerve():
@@ -42,4 +50,4 @@ app.register_blueprint(simple_page)
 if __name__ == '__main__':
     minion.core.setup.discover()
     settings = boss.settings.settings
-    app.run(debug=settings.get('debug', False), host=settings.get('host', '127.0.0.1'), port=settings.get('port', 5555))
+    app.run(debug=settings.get('debug', False), host=settings.get('host', 'localhost'), port=settings.get('port', 5555))

@@ -25,7 +25,16 @@ class BaseSensor(minion.core.components.NervousComponent):
 
         self.postprocessors = processors
 
-        self.preprocessors = preprocessors
+        processors = []
+        for p in preprocessors:
+            try:
+                c = minion.core.utils.module_loading.import_string(p['class'])
+            except ImportError:
+                logger.critical('Unable to import {}'.format(p['class']))
+            else:
+                processors.append(c(p.get('configuration', {})))
+
+        self.preprocessors = processors
 
         # Try updating configuration if it exists on the class
         try:
@@ -44,14 +53,18 @@ class BaseSensor(minion.core.components.NervousComponent):
         return
 
     def is_active(self):
-        # Run all the preprocessors of type ActiveStatePreprocessor
+        # Run all the preprocessors, expect all to return true, otherwise stop
+        go_ahead = True
         for p in self.preprocessors:
-            print p
-        return self.active
+            if not p.test():
+                go_ahead = False
+                break
+        return go_ahead
 
     def run(self):
-        data = self.sense()
-        self.post_process(data)
+        if self.is_active():
+            data = self.sense()
+            self.post_process(data)
         return
 
     def get_publish_channel(self):
@@ -74,11 +87,6 @@ class BaseSensor(minion.core.components.NervousComponent):
         raise NotImplementedError('Sense method needs to be implemented on sensor')
 
 
-class AlwaysOnSensor(object):
-    def is_active(self):
-        return True
-
-
 class ContinuousSensor(BaseSensor):
     # Key that the constructor will look for either on the class or in the configuration
     period_attribute = 'period'
@@ -94,11 +102,20 @@ class ContinuousSensor(BaseSensor):
         logger.debug('Creating continuous sensor <%s> with period %s', self.name, self.period)
 
     def run(self):
-        while self.is_active():
-            try:
-                data = self.sense()
-            except exceptions.DataUnavailable:
-                pass
-            else:
-                threading.Thread(target=self.post_process, args=(data,)).start()
-            time.sleep(self.period)
+        immediate = self.get_configuration('immediate', True)
+        while True:
+            if not immediate:
+                time.sleep(self.period)
+
+            # Sensor might not be active
+            if self.is_active():
+                try:
+                    data = self.sense()
+                except exceptions.DataUnavailable:
+                    pass
+                else:
+                    threading.Thread(target=self.post_process, args=(data,)).start()
+
+            # Pause after
+            if immediate:
+                time.sleep(self.period)

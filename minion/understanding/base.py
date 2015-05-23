@@ -1,5 +1,6 @@
 import re
 import multiprocessing
+import minion.understanding.exceptions
 import minion.core.components
 import minion.core.components.exceptions
 import threading
@@ -41,6 +42,7 @@ class BaseCommand(minion.core.components.BaseComponent):
 
     def matches(self, command):
         commands = []
+
         for regular_expression in self.expressions:
             m = regular_expression.match(command)
             if m:
@@ -48,7 +50,10 @@ class BaseCommand(minion.core.components.BaseComponent):
                     commands.append(m.groups())
                 else:
                     return m.groups()
-        return commands
+        if commands.__len__():
+            return commands
+        else:
+            raise minion.understanding.exceptions.DoesNotMatch
 
     def __str__(self):
         return self.name or self.__class__.__name__
