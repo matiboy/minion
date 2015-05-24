@@ -1,3 +1,5 @@
+__test__ = False
+
 import importlib
 import inquirer
 import json

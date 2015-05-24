@@ -45,3 +45,6 @@ class CommitToMemory(minion.acting.base.BaseActuator):
 
     def temporary(self, key, value, duration, *args):
         self.redis_client.setex(key, duration, value)
+
+    def forget(self, key, *args):
+        self.redis_client.delete(key)

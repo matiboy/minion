@@ -17,5 +17,17 @@ class StateToMemory(minion.understanding.base.BaseCommand):
         # Default to 1 for cases where just setting a value is sufficient
         return self.get_configuration('value', 1)
 
+    def get_state(self):
+        return self.get_configuration('state')
+
+    def _build_command(self, original_command, *commands):
+        return 'set {} {}'.format(self.get_state(), self.get_value())
+
     def _understand(self, original_command, *commands):
-        return minion.understanding.operations.UnderstandingOperation(self.get_command(), self.get_value())
+        body = self._build_command(original_command, *commands)
+        return minion.understanding.operations.UnderstandingOperation(self.get_command(), body)
+
+
+class ForgetState(StateToMemory):
+    def _build_command(self, original_command, *commands):
+        return 'forget {}'.format(self.get_state())

@@ -17,7 +17,7 @@ import clint.textui
 import json
 import logging
 import minion.core
-import minion.core.setup
+import minion.core.configure
 import minion.core.components.exceptions
 import minion.core.utils.console
 import minion.core.utils.functions
@@ -108,7 +108,7 @@ def main(argv):
         run(settings)
 
     elif options['setup']:
-        minion.core.setup.setup(settings)
+        minion.core.configure.setup(settings)
 
 
 if __name__ == '__main__':

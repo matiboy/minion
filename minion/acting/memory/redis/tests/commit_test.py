@@ -16,6 +16,9 @@ class FakeRedisClient(object):
     def setex(self, key, duration, value):
         pass
 
+    def delete(self, key):
+        pass
+
 fake_redis_client = FakeRedisClient()
 
 
@@ -38,6 +41,15 @@ class RespondToActTestMethod(unittest.TestCase):
         with mock.patch.object(actuator, 'temporary') as s:
             actuator.act('temporary this that seconds')
             s.assert_called_with('this', 'that', 'seconds')
+
+    @mock.patch.object(commit.CommitToMemory, '_setup_redis_client', return_value=fake_redis_client)
+    def test_delete(self, *args):
+        """ Should call forget """
+        actuator = commit.CommitToMemory('some name', {})
+
+        with mock.patch.object(actuator, 'forget') as s:
+            actuator.act('forget lalala')
+            s.assert_called_with('lalala')
 
     @mock.patch.object(commit.CommitToMemory, '_setup_redis_client', return_value=fake_redis_client)
     def test_temporary_too_short(self, *args):
@@ -64,3 +76,11 @@ class RespondToActTestMethod(unittest.TestCase):
         actuator = commit.CommitToMemory('some name', {})
         actuator.act('temporary this that 200 something else')
         fake_redis_client.setex.assert_called_with('this', '200', 'that')
+
+    @mock.patch.object(fake_redis_client, 'delete')
+    @mock.patch.object(commit.CommitToMemory, '_setup_redis_client', return_value=fake_redis_client)
+    def test_forget_too_long(self, *args):
+        """ Should call delete with only part of the text """
+        actuator = commit.CommitToMemory('some name', {})
+        actuator.act('forget blop that 200 something else')
+        fake_redis_client.delete.assert_called_with('blop')

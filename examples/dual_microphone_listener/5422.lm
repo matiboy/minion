@@ -1,0 +1,51 @@
+Language model created by QuickLM on Sun May 24 01:48:55 EDT 2015
+Copyright (c) 1996-2010 Carnegie Mellon University and Alexander I. Rudnicky
+
+The model is in standard ARPA format, designed by Doug Paul while he was at MITRE.
+
+The code that was used to produce this language model is available in Open Source.
+Please visit http://www.speech.cs.cmu.edu/tools/ for more information
+
+The (fixed) discount mass is 0.5. The backoffs are computed using the ratio method.
+This model based on a corpus of 4 sentences and 8 words
+
+\data\
+ngram 1=8
+ngram 2=10
+ngram 3=10
+
+\1-grams:
+-0.9542 </s> -0.3010
+-0.9542 <s> -0.2499
+-1.5563 GO -0.2888
+-0.9542 MINION -0.1919
+-1.2553 SLEEP -0.2499
+-1.5563 TO -0.2762
+-1.5563 UP -0.2499
+-1.5563 WAKE -0.2888
+
+\2-grams:
+-0.3010 <s> MINION 0.0000
+-0.3010 GO TO 0.0000
+-0.9031 MINION </s> -0.3010
+-0.9031 MINION GO 0.0000
+-0.9031 MINION SLEEP 0.0000
+-0.9031 MINION WAKE 0.0000
+-0.3010 SLEEP </s> -0.3010
+-0.3010 TO SLEEP 0.0000
+-0.3010 UP </s> -0.3010
+-0.3010 WAKE UP 0.0000
+
+\3-grams:
+-0.9031 <s> MINION </s>
+-0.9031 <s> MINION GO
+-0.9031 <s> MINION SLEEP
+-0.9031 <s> MINION WAKE
+-0.3010 GO TO SLEEP
+-0.3010 MINION GO TO
+-0.3010 MINION SLEEP </s>
+-0.3010 MINION WAKE UP
+-0.3010 TO SLEEP </s>
+-0.3010 WAKE UP </s>
+
+\end\
