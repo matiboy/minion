@@ -1,76 +1,66 @@
 from __future__ import absolute_import
 import unittest
-from .. import intents
+from .. import commit
 import mock
-import minion.core.components.exceptions
 import sure  # though lint complains that it's never used this is needed
 
 
-class IntentEqualsPreprocessorConfiguration(unittest.TestCase):
-    def test_no_value(self):
-        """ Should raise if no value passed """
-        intents.IntentEquals.when.called_with({}).should.throw(minion.core.components.exceptions.ImproperlyConfigured)
-
-    def test_ok(self):
-        """ Should not raise if all ok """
-        intents.IntentEquals.when.called_with({'value': 10}).should_not.throw(minion.core.components.exceptions.ImproperlyConfigured)
-
-
 class FakeRedisClient(object):
-    """ Helper class """
-    def __init__(self, value):
-        self.value = value
+    """
+        Helper class
+        Avoids depending on having an actual redis server running during tests
+    """
+    def set(self, key, value):
+        pass
 
-    def get(self, key):
-        return self.value
+    def setex(self, key, duration, value):
+        pass
 
-
-class IntentExistsTestMethod(unittest.TestCase):
-    """ Test actual checks"""
-    @mock.patch.object(intents.BaseIntent, '_setup_redis_client', return_value=FakeRedisClient(None))
-    def test_does_not_exist(self, mock_redis_client):
-        """ Should return false if getting returns none """
-        pp = intents.IntentExists({})
-        pp.test().should_not.be.ok
-
-    @mock.patch.object(intents.BaseIntent, '_setup_redis_client', return_value=FakeRedisClient(1))
-    def test_does_exists(self, mock_redis_client):
-        """ Should return true if getting returns something """
-        pp = intents.IntentExists({})
-        pp.test().should.be.ok
+fake_redis_client = FakeRedisClient()
 
 
-class IntentDoesNotExistTestMethod(unittest.TestCase):
-    """ Test actual checks"""
-    @mock.patch.object(intents.BaseIntent, '_setup_redis_client', return_value=FakeRedisClient(None))
-    def test_does_not_exist(self, mock_redis_client):
-        """ Should return true if getting returns none """
-        pp = intents.IntentDoesNotExist({})
-        pp.test().should.be.ok
+class RespondToActTestMethod(unittest.TestCase):
+    """ Test actions depending on message """
+    @mock.patch.object(commit.CommitToMemory, '_setup_redis_client', return_value=fake_redis_client)
+    def test_set(self, *args):
+        """ Should call set """
+        actuator = commit.CommitToMemory('some name', {})
 
-    @mock.patch.object(intents.BaseIntent, '_setup_redis_client', return_value=FakeRedisClient(1))
-    def test_does_exists(self, mock_redis_client):
-        """ Should return false if getting returns something """
-        pp = intents.IntentDoesNotExist({})
-        pp.test().should_not.be.ok
+        with mock.patch.object(actuator, 'set') as s:
+            actuator.act('set this that')
+            s.assert_called_with('this', 'that')
 
+    @mock.patch.object(commit.CommitToMemory, '_setup_redis_client', return_value=fake_redis_client)
+    def test_temporary(self, *args):
+        """ Should call temporary """
+        actuator = commit.CommitToMemory('some name', {})
 
-class IntentEqualsTestMethod(unittest.TestCase):
-    """ Test actual checks"""
-    @mock.patch.object(intents.BaseIntent, '_setup_redis_client', return_value=FakeRedisClient(None))
-    def test_does_not_exist(self, mock_redis_client):
-        """ Should return false if getting returns none """
-        pp = intents.IntentEquals({'value': '1'})
-        pp.test().should_not.be.ok
+        with mock.patch.object(actuator, 'temporary') as s:
+            actuator.act('temporary this that seconds')
+            s.assert_called_with('this', 'that', 'seconds')
 
-    @mock.patch.object(intents.BaseIntent, '_setup_redis_client', return_value=FakeRedisClient('2'))
-    def test_wrong_value(self, mock_redis_client):
-        """ Should return false if getting returns something else """
-        pp = intents.IntentEquals({'value': '1'})
-        pp.test().should_not.be.ok
+    @mock.patch.object(commit.CommitToMemory, '_setup_redis_client', return_value=fake_redis_client)
+    def test_temporary_too_short(self, *args):
+        """ Should fail to call temporary """
+        actuator = commit.CommitToMemory('some name', {})
 
-    @mock.patch.object(intents.BaseIntent, '_setup_redis_client', return_value=FakeRedisClient('1'))
-    def test_does_exists(self, mock_redis_client):
-        """ Should return true if getting returns the same value """
-        pp = intents.IntentEquals({'value': '1'})
-        pp.test().should.be.ok
+        with mock.patch.object(commit.logger, 'error') as logger_error:
+            actuator.act('temporary this that')
+            logger_error.assert_called_with('Insufficient number of parts in message')
+
+    @mock.patch.object(commit.CommitToMemory, '_setup_redis_client', return_value=fake_redis_client)
+    def test_set_too_short(self, *args):
+        """ Should fail to call set """
+        actuator = commit.CommitToMemory('some name', {})
+
+        with mock.patch.object(commit.logger, 'error') as logger_error:
+            actuator.act('set this')
+            logger_error.assert_called_with('Insufficient number of parts in message')
+
+    @mock.patch.object(fake_redis_client, 'setex')
+    @mock.patch.object(commit.CommitToMemory, '_setup_redis_client', return_value=fake_redis_client)
+    def test_temporary_too_long(self, *args):
+        """ Should call setex with only part of the text """
+        actuator = commit.CommitToMemory('some name', {})
+        actuator.act('temporary this that 200 something else')
+        fake_redis_client.setex.assert_called_with('this', '200', 'that')

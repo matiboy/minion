@@ -15,9 +15,9 @@ class CommitToMemory(minion.acting.base.BaseActuator):
 
     def __init__(self, name, configuration, channels=[], **kwargs):
         super(CommitToMemory, self).__init__(name, configuration, channels, **kwargs)
-        self.redis_client = self._get_redis_client()
+        self.redis_client = self._setup_redis_client()
 
-    def _get_redis_client(self):
+    def _setup_redis_client(self):
         redis_config = self.get_configuration_dict('host', 'port', 'db')
         return redis.StrictRedis(**redis_config)
 
@@ -31,6 +31,10 @@ class CommitToMemory(minion.acting.base.BaseActuator):
             # Take the first as action, pass the rest
             action = all_stuff.pop(0)
             getattr(self, action)(*all_stuff)
+        except IndexError:
+            logger.error('Message is empty')
+        except TypeError:
+            logger.error('Insufficient number of parts in message')
         except ValueError:
             logger.error('An error occured while trying to parse commit to memory command %s', message)
         except AttributeError:
