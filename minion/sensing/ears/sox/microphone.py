@@ -48,7 +48,8 @@ class MicrophoneSelectiveListener(MicrophoneListener):
             'b': 16
         }
     }
-    period = 0.1
+    # TODO This should be configurable!
+    period = 1
 
     def _update_configuration(self, configuration):
         """

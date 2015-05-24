@@ -23,12 +23,18 @@ class CommitToMemory(minion.acting.base.BaseActuator):
 
     def act(self, message):
         try:
-            action, key, value = message.split(self.get_separator())
-            getattr(self, action)(key, value)
+            # Wish I could use python 3's action, *rest = message.split
+            all_stuff = message.split(self.get_separator())
+            # Take the first as action, pass the rest
+            action = all_stuff.pop(0)
+            getattr(self, action)(*all_stuff)
         except ValueError:
             logger.error('An error occured while trying to parse commit to memory command %s', message)
         except AttributeError:
             logger.error('Commit to memory command not recognized %s (from message %s)', action, message)
 
-    def set(self, key, value):
+    def set(self, key, value, *args):
         self.redis_client.set(key, value)
+
+    def temporary(self, key, value, duration, *args):
+        self.redis_client.setex(key, duration, value)
