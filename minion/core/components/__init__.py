@@ -31,6 +31,9 @@ class BaseComponent(object):
     def get_configuration(self, key, default=None):
         return self._configuration.get(key, default)
 
+    def get_configuration_dict(self, *args):
+        return {x: self.get_configuration(x) for x in args}
+
     def _validate_configuration(self):
         """
             Should raise ImproperlyConfigured if any issue
