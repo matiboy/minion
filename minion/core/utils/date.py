@@ -18,3 +18,17 @@ def date_shift(numbers, unit, now=None):
     after_shift = now.replace(**kwargs)
 
     return after_shift
+
+
+def easily_readable_time(dt):
+    # Make sure we have an instance of arrow
+    if not isinstance(dt, arrow.Arrow):
+        dt = arrow.get(dt)
+
+    # Capitalizing AM/PM forces TTS to say "am" as "A M"
+    dt_format = 'h mm A'
+    # Remove 00 if minutes are 0
+    if dt.format('mm') == '00':
+        dt_format = 'h A'
+
+    return dt.format(dt_format)

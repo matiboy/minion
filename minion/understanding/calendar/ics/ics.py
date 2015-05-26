@@ -3,6 +3,7 @@ import arrow
 import ics
 import minion.understanding.base
 import minion.core.components.exceptions
+import minion.core.utils.date
 import requests
 import urlparse
 
@@ -49,14 +50,21 @@ class IcsCalendar(minion.understanding.base.BaseCommand):
 
     def _events_to_messages(self, events):
         message = []
-        # TODO Configurable?
-        format = 'h mm A'
         for e in events:
             # TODO Look into all the cases
             begin = e.begin.to('local')
-            start = begin.format(format)
-            end = (begin + e.duration).format(format)
-            message.append('{begin} to {end}. {name} at {location}'.format(begin=start, end=end, name=e.name, location=e.location))
+            start = minion.core.utils.date.easily_readable_time(begin)
+            end = minion.core.utils.date.easily_readable_time(begin + e.duration)
+            arguments = {
+                'begin': start,
+                'end': end,
+                'name': e.name,
+                'location': '',
+            }
+            if e.location:
+                arguments['location'] = ' at {}'.format(e.location)
+
+            message.append('{begin} to {end}. {name} {location}'.format(**arguments))
 
         return message
 
