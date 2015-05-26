@@ -36,6 +36,7 @@ class BaseSensor(minion.core.components.NervousComponent):
 
         self.preprocessors = processors
 
+        # TODO Check whether this is still needed. Doesn't the base component do all this?
         # Try updating configuration if it exists on the class
         try:
             self.configuration = self.configuration.copy()

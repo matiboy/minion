@@ -13,7 +13,7 @@ class UnableToParse(Exception):
 
 
 class SimpleParser(object):
-    def parse(self, data):
+    def parse(self, data, *args):
         try:
             return data['result']['resolvedQuery']
         except (ValueError, KeyError):
@@ -21,14 +21,26 @@ class SimpleParser(object):
 
 
 class ActionParser(SimpleParser):
-    def parse(self, data):
+    def _get_result_and_action(self, data):
         try:
             result = data['result']
         except KeyError:
             raise UnableToParse
 
-        action = result.get('action', '')
+        return result, result.get('action', '')
 
+    def _to_json(self, result, action):
+        return json.dumps({
+            'action': action,
+            'parameters': result.get('parameters', {}),
+            'fulfillment': result.get('fulfillment', '')
+        })
+
+    def _simple_parse(self, data):
+        return super(ActionParser, self).parse(data)
+
+    def parse(self, data, *args):
+        result, action = self._get_result_and_action(data)
         if not action or '.unknown' in action:
             # Could be fulfillment
             fulfillment = result.get('fulfillment', '')
@@ -39,9 +51,28 @@ class ActionParser(SimpleParser):
                 })
 
             # Just normal STT
-            return super(ActionParser, self).parse(data)
+            return self._simple_parse(data)
 
-        # cant rely on json dumps to keep action first
+        return self._to_json(result, action)
+
+
+class SelectedActionsParser(SimpleParser):
+    def parse(self, data, stt, *args):
+        result, action = self._get_result_and_action(data)
+
+        if action in stt.selected_actions:
+            return self._to_json
+            # Could be fulfillment
+            fulfillment = result.get('fulfillment', '')
+            if fulfillment and fulfillment.get('speech', ''):
+                return json.dumps({
+                    'action': 'apiai:fulfillment',
+                    'fulfillment': fulfillment['speech']
+                })
+
+            # Just normal STT
+            return self._simple_parse(data)
+
         return json.dumps({
             'action': action,
             'parameters': result.get('parameters', {}),
@@ -51,7 +82,8 @@ class ActionParser(SimpleParser):
 
 PARSERS = {
     'simple': SimpleParser,
-    'action': ActionParser
+    'action': ActionParser,
+    'selected_actions': SelectedActionsParser,
 }
 
 
@@ -64,6 +96,9 @@ class ApiaiSpeechToText(minion.sensing.postprocessors.BasePostprocessor):
         # Select the parser according to configuration or default to simple parser
         parser_class = self.get_configuration('parser', 'simple')
         self.parser = PARSERS[parser_class]()
+        # Used for selected actions parser
+        # TODO Do we really want to set this on the object and not on the parser?
+        self.selected_actions = self.get_configuration('selected_actions', [])
         self.ai = apiai.ApiAI(self.CLIENT_ACCESS_TOKEN, self.SUBSCRIBTION_KEY)
 
     def _validate_configuration(self):
@@ -80,8 +115,8 @@ class ApiaiSpeechToText(minion.sensing.postprocessors.BasePostprocessor):
 
         try:
             data = json.loads(response.read())
-            logger.debug(data)
-            return self.parser.parse(data)
+            logger.debug('Data received from API.ai %s', data)
+            return self.parser.parse(data, self)
         except (ValueError, UnableToParse):
             # Acceptable errors which just mean we couldn't understand
             raise minion.sensing.exceptions.DataUnaivalable

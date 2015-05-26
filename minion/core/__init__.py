@@ -42,7 +42,7 @@ class Minion(object):
 
         for name, object_class, object_details in classes:
             if name in self.sensors:
-                raise exceptions.NameConflict('Sensor name <%s> is already in use', name)
+                raise exceptions.NameConflict('Sensor name <{}> is already in use'.format(name))
 
             sensor = object_class(name, self.nervous_system, **object_details)
 
@@ -52,7 +52,7 @@ class Minion(object):
         classes = self._get_classes(*actuators)
         for name, object_class, object_details in classes:
             if name in self.actuators:
-                raise exceptions.NameConflict('Actuator name <%s> is already in use', name)
+                raise exceptions.NameConflict('Actuator name <{}> is already in use'.format(name))
 
             actuator = object_class(name, **object_details)
 
@@ -62,7 +62,7 @@ class Minion(object):
         classes = self._get_classes(*commands)
         for name, object_class, object_details in classes:
             if name in self.commands:
-                raise exceptions.NameConflict('Command name <%s> is already in use', name)
+                raise exceptions.NameConflict('Command name <{}> is already in use'.format(name))
 
             command = object_class(name, object_details['configuration'])
 

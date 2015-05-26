@@ -16,10 +16,10 @@ class BaseCommand(minion.core.components.BaseComponent):
     multi = False
     threaded = False
 
-    def __init__(self, name, configuration):
+    def __init__(self, name, configuration, preprocessors=[]):
         super(BaseCommand, self).__init__(name, configuration)
         logger.info('Registering command <%s> with configuration %s.', self.name, self._configuration)
-        # TODO Add prefix
+        # TODO Add prefix?
         # Parse regular expressions
         self.expressions = [re.compile(exp) for exp in self.get_configuration('expressions', [])]
         if self.threaded:
@@ -27,6 +27,17 @@ class BaseCommand(minion.core.components.BaseComponent):
         else:
             self.understand_runner = UnderstandRunner()
         logger.info('Command <%s> will respond to the following expressions: %s', self.name, ', '.join(map(lambda x: x.pattern, self.expressions)))
+
+        processors = []
+        for p in preprocessors:
+            try:
+                c = minion.core.utils.module_loading.import_string(p['class'])
+            except ImportError:
+                logger.critical('Unable to import {}'.format(p['class']))
+            else:
+                processors.append(c(p.get('configuration', {})))
+
+        self.preprocessors = processors
 
     def understand(self, nervous_system, original_command, *commands):
         self.understand_runner.run(self, nervous_system, original_command, *commands)
@@ -101,7 +112,7 @@ class UnderstandRunner(object):
 
 class ThreadedUnderstandRunner(UnderstandRunner):
     """
-    Calls the same exactly, but threaded
+    Calls the same as Understand Runner exactly, but threaded
     """
     def run(self, *args):
         t = threading.Thread(target=super(ThreadedUnderstandRunner, self).run, args=args)

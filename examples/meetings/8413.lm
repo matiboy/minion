@@ -1,0 +1,74 @@
+Language model created by QuickLM on Mon May 25 20:46:58 EDT 2015
+Copyright (c) 1996-2010 Carnegie Mellon University and Alexander I. Rudnicky
+
+The model is in standard ARPA format, designed by Doug Paul while he was at MITRE.
+
+The code that was used to produce this language model is available in Open Source.
+Please visit http://www.speech.cs.cmu.edu/tools/ for more information
+
+The (fixed) discount mass is 0.5. The backoffs are computed using the ratio method.
+This model based on a corpus of 6 sentences and 14 words
+
+\data\
+ngram 1=14
+ngram 2=19
+ngram 3=18
+
+\1-grams:
+-1.0000 </s> -0.3010
+-1.0000 <s> -0.2472
+-1.7782 DO -0.2937
+-1.7782 GO -0.2937
+-1.7782 HAVE -0.2863
+-1.7782 I -0.2937
+-1.4771 MEETINGS -0.2788
+-1.1761 MINION -0.2218
+-1.4771 SLEEP -0.2553
+-1.7782 TO -0.2863
+-1.4771 TODAY -0.2553
+-1.7782 UP -0.2553
+-1.7782 WAKE -0.2937
+-1.7782 WHAT -0.2863
+
+\2-grams:
+-1.0792 <s> MEETINGS -0.1761
+-0.4771 <s> MINION 0.0000
+-1.0792 <s> WHAT 0.0000
+-0.3010 DO I 0.0000
+-0.3010 GO TO 0.0000
+-0.3010 HAVE TODAY 0.0000
+-0.3010 I HAVE 0.0000
+-0.6021 MEETINGS DO 0.0000
+-0.6021 MEETINGS TODAY 0.0000
+-0.9031 MINION </s> -0.3010
+-0.9031 MINION GO 0.0000
+-0.9031 MINION SLEEP 0.0000
+-0.9031 MINION WAKE 0.0000
+-0.3010 SLEEP </s> -0.3010
+-0.3010 TO SLEEP 0.0000
+-0.3010 TODAY </s> -0.3010
+-0.3010 UP </s> -0.3010
+-0.3010 WAKE UP 0.0000
+-0.3010 WHAT MEETINGS -0.1761
+
+\3-grams:
+-0.3010 <s> MEETINGS TODAY
+-0.9031 <s> MINION </s>
+-0.9031 <s> MINION GO
+-0.9031 <s> MINION SLEEP
+-0.9031 <s> MINION WAKE
+-0.3010 <s> WHAT MEETINGS
+-0.3010 DO I HAVE
+-0.3010 GO TO SLEEP
+-0.3010 HAVE TODAY </s>
+-0.3010 I HAVE TODAY
+-0.3010 MEETINGS DO I
+-0.3010 MEETINGS TODAY </s>
+-0.3010 MINION GO TO
+-0.3010 MINION SLEEP </s>
+-0.3010 MINION WAKE UP
+-0.3010 TO SLEEP </s>
+-0.3010 WAKE UP </s>
+-0.3010 WHAT MEETINGS DO
+
+\end\
