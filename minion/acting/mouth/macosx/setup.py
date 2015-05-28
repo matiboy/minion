@@ -20,18 +20,39 @@ defines = {
             ''',
             'questions': [
                 inquirer.List('voice', message='Select a voice', choices=[
-                    'Bruce',
-                    'Agnes',
-                    'Kathy',
-                    'Princess',
-                    'Vicki',
-                    'Victoria',
-                    'Alex',
-                    'Fred',
-                    'Junior',
-                    'Ralph',
-                ]),
-            ]
+                        'Bruce',
+                        'Agnes',
+                        'Kathy',
+                        'Princess',
+                        'Vicki',
+                        'Victoria',
+                        'Alex',
+                        'Fred',
+                        'Junior',
+                        'Ralph',
+                    ]),
+            ],
+            'setup': [
+                {
+                    'name': 'voice',
+                    'default': 'localhost',
+                    'type': 'select',
+                    'message': 'Select voice',
+                    'choices': [
+                        'Bruce',
+                        'Agnes',
+                        'Kathy',
+                        'Princess',
+                        'Vicki',
+                        'Victoria',
+                        'Alex',
+                        'Fred',
+                        'Junior',
+                        'Ralph',
+                    ]
+                }
+            ],
+            'requirements': ()
         }
     ]
 }
