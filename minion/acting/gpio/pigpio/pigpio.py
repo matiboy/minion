@@ -24,5 +24,5 @@ class OnThenOff(minion.acting.base.BaseActuator):
         pi.write(self._get_pin(), 0)
 
     def act(self, *args, **kwargs):
-        t = threading.Thread(target=super(OnThenOff, self)._turn_on_then_off)
+        t = threading.Thread(target=self._turn_on_then_off)
         t.start()
