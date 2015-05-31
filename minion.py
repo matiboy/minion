@@ -22,7 +22,6 @@ import minion.core.components.exceptions
 import minion.core.utils.console
 import minion.core.utils.functions
 import minion.core.utils.module_loading
-import minion.understanding.errors
 import multiprocessing
 import os
 import sys
