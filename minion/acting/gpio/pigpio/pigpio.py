@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import minion.acting.base
 import minion.core.utils.functions
 import multiprocessing
