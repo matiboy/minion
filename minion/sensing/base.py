@@ -78,10 +78,15 @@ class BaseSensor(minion.core.components.NervousComponent):
     def post_process(self, data):
         logger.debug('Sensor data received, preparing to post process')
         for p in self.postprocessors:
-            logger.debug(p)
             data = p.process(data)
 
         # Use nervous system to pass on data
+        self.publish_on_nervous_system(data)
+
+    def publish_on_nervous_system(self, data):
+        """
+        Publishes onto the nervous system to a default channel
+        """
         self.nervous_system.publish(channel=self.get_publish_channel(), message=data)
 
     def sense(self):

@@ -1,6 +1,7 @@
 from .components import exceptions
 import minion.core.utils.module_loading
 import multiprocessing
+import six
 import time
 
 logger = multiprocessing.get_logger()
@@ -76,8 +77,11 @@ class Minion(object):
         # Gather from sensors
         for sensor in self.get_sensors():
             sensor_channel = sensor.get_publish_channel()
-            if sensor_channel is not None:
+            if isinstance(sensor_channel, six.string_types):
                 publish_channels.add(sensor_channel)
+            elif isinstance(sensor_channel, list):
+                for x in sensor_channel:
+                    publish_channels.add(sensor_channel)
 
         actuator_channels = set()
         for actuator in self.get_actuators():
