@@ -63,59 +63,26 @@ def _prepare_google_apiai_config(answers, component):
 defines = {
     minion.core.components.Types.SENSOR: [
         {
-            'name': 'Always listening microphone with silence detection - Google STT',
-            'class': 'minion.sensing.ears.sox.microphone.MicrophoneSelectiveListener',
-            'questions': [
-                inquirer.Text('rate', message='Recording rate (Hz)', default='16000'),
-                inquirer.Text('silence_pre_level', message='Level of silence before recording (%)', default='10%'),
-                inquirer.Text('silence_pre_duration', message='Duration of noise before recording (seconds)', default='0.5'),
-                inquirer.Text('silence_post_level', message='Level of silence before stop recording (%)', default='10%'),
-                inquirer.Text('silence_post_duration', message='Duration of silence to stop recording (seconds)', default='0.8'),
-                inquirer.Text('api_key', message='Google API key'),
-                inquirer.Text('limit_duration', message='Reduce recording before sending to API to how many seconds?', default=10)
-            ],
+            'name': 'Heartbeat',
+            'class': 'minion.sensing.heartbear.beat.Heartbeat',
             'description': '''
-# Uses SOX to record constantly via the microphone.
-# Starts recording when there is sufficient noise (silence_pre_level) for a sufficient duration (silence_pre_duration)
-# Stops recording when there is a long enough silence (below silence_post_level for at least silence_post_duration seconds)
-#
-# Then uses Google Speech API to translate to a string
-# Refer to http://stackoverflow.com/questions/26485531/google-speech-api-v2 to get an API key
-#
-# Requires SOX to be installed
+<h3>Repeats a simple command at given intervals</h3>
+<h4>Output: command</h4>
+<p>Used mostly for debugging purposes</p>
             ''',
-            'requirements': (
-                'pysox',
-            ),
-            'process_answers': _prepare_google_stt_config
-        },
-        {
-            'name': 'Always listening microphone with silence detection - Api.ai STT',
-            'class': 'minion.sensing.ears.sox.microphone.MicrophoneSelectiveListener',
-            'questions': [
-                inquirer.Text('rate', message='Recording rate (Hz)', default='16000'),
-                inquirer.Text('silence_pre_level', message='Level of silence before recording (%)', default='10%'),
-                inquirer.Text('silence_pre_duration', message='Duration of noise before recording (seconds)', default='0.5'),
-                inquirer.Text('silence_post_level', message='Level of silence before stop recording (%)', default='10%'),
-                inquirer.Text('silence_post_duration', message='Duration of silence to stop recording (seconds)', default='0.8'),
-                inquirer.Text('SUBSCRIBTION_KEY', message='Subscription key'),
-                inquirer.Text('CLIENT_ACCESS_TOKEN', message='Client access token'),
-                inquirer.Text('limit_duration', message='Reduce recording before sending to API to how many seconds?', default=10)
-            ],
-            'description': '''
-# Uses SOX to record constantly via the microphone.
-# Starts recording when there is sufficient noise (silence_pre_level) for a sufficient duration (silence_pre_duration)
-# Stops recording when there is a long enough silence (below silence_post_level for at least silence_post_duration seconds)
-#
-# Then uses API.ai to translate to a string
-# Refer to http://api.ai to get an access token
-#
-# Requires SOX to be installed
-            ''',
-            'requirements': (
-                'pysox',
-            ),
-            'process_answers': _prepare_google_apiai_config
+            'setup': [{
+                'type': 'input',
+                'name': 'message',
+                'default': 'say hi',
+                'message': 'Message to output at regular interval'
+            },
+            {
+                'type': 'input',
+                'name': 'period',
+                'default': '30',
+                'message': 'Period to repeat command in seconds'
+            }],
+            'requirements': (),
         }
     ]
 }

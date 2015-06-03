@@ -23,9 +23,15 @@ html.no-js
             | to improve your experience.
         <![endif]-->
 
-    nav
-        a(href=url_for('simple_page.dashboard')) Home
-        a(href=url_for('simple_page.nerve')) Nervous system
+    nav.navbar.navbar-default
+        .container-fluid
+            ul.nav.navbar-nav
+                li
+                    a(href=url_for('simple_page.dashboard')) Home
+                li
+                    a(href=url_for('simple_page.nerve')) Nervous system
+                li
+                    a(href=url_for('simple_page.sensors')) Sensors
 
 
     block content

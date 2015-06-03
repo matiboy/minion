@@ -7,7 +7,7 @@ block stylesheets
 block content
     .container
         .jumbotron
-            h1 Welcome Boss!
+            h1 Patalaki patalaku Big Boss
 
         table#dashboard.table
             tr
@@ -19,12 +19,13 @@ block content
                             i.ok.fa.fa-check-square-o
 
                 td
-                    i.fa.fa-eye.fa-5x
-                    p Sensors
-                    if sensors_count > 0
-                        span.badge.ok=sensors_count
-                    else
-                        span.badge=sensors_count
+                    a(href="/sensors")
+                        i.fa.fa-eye.fa-5x
+                        p Sensors
+                        if sensors_count > 0
+                            span.badge.ok=sensors_count
+                        else
+                            span.badge=sensors_count
             tr
                 td
                     i.fa.fa-5x.fa-cogs

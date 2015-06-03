@@ -36,6 +36,7 @@ def save_nerve():
 
     return flask.jsonify(status=0)
 
+
 @simple_page.route('/nerve')
 @boss.utils.auth.requires_auth
 def nerve():
@@ -45,6 +46,53 @@ def nerve():
         nervous_system=json.dumps(settings['nerve']),
         available_nerves=json.dumps(modules[minion.core.components.Types.NERVOUS_SYSTEM]),
         systems=modules[minion.core.components.Types.NERVOUS_SYSTEM]
+        )
+
+
+@simple_page.route('/save_sensor', methods=['POST'])
+@boss.utils.auth.requires_auth
+def save_sensor():
+    setup = flask.request.get_json()
+    boss.settings.save('sensors', setup)
+
+    return flask.jsonify(status=0)
+
+
+@simple_page.route('/sensors')
+@boss.utils.auth.requires_auth
+def sensors():
+    # Let's make sure we don't affect the existing stuff
+    sensors = flask.g.settings.get('sensors', [])
+    for i, x in enumerate(sensors):
+        x['index'] = i+1
+    return flask.render_template('sensors.jade',
+        sensors=sensors,
+        )
+
+
+@simple_page.route('/sensors/create')
+@boss.utils.auth.requires_auth
+def add_sensor():
+    modules = minion.core.configure.modules
+    return flask.render_template('sensor.jade',
+        index=-1,
+        sensor='{}',
+        available_sensors=json.dumps(modules[minion.core.components.Types.SENSOR]),
+        systems=modules[minion.core.components.Types.SENSOR]
+        )
+
+
+@simple_page.route('/sensors/<index>')
+@boss.utils.auth.requires_auth
+def sensor(index):
+    modules = minion.core.configure.modules
+    settings = flask.g.settings
+    return flask.render_template('sensor.jade',
+        index=index,
+        sensor=json.dumps(settings['sensors'][index-1]),
+        editing=True
+        # available_sensors=json.dumps(modules[minion.core.components.Types.SENSOR]),
+        # systems=modules[minion.core.components.Types.SENSOR]
         )
 
 app.register_blueprint(simple_page)

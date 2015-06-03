@@ -1,0 +1,30 @@
+extends ./edit.jade
+
+block stylesheets
+    {{ super() }}
+    link(rel='stylesheet', href=url_for('simple_page.static', filename='stylesheets/sensor.css'))
+
+block scripts
+    script.
+        var sensor = !{sensor};
+        var availableSensors = !{available_sensors};
+    script(src=url_for('simple_page.static', filename='scripts/sensor.js'))
+
+block content
+    .container(ng-app='Boss', ng-controller='SensorController')
+        .jumbotron
+            h1(ng-bind="obj.name")
+
+        form(method='post', ng-submit='submit()')
+            .form-group
+                label Name
+                input.form-control(type='text', name='name', placeholder='Enter sensor name', ng-model='obj.name')
+
+            .form-group
+                label Class
+                select.form-control(ng-model='obj.class', ng-options='c as c for c in availableSensorClasses')
+            
+            {% include "./systems.jade" %}
+            button.btn.btn-info(type="submit") Save
+
+        

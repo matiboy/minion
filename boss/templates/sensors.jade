@@ -1,0 +1,22 @@
+extends ./base.jade
+
+block content
+    .container(ng-app='Boss')
+        .jumbotron
+            h1 Sensors
+            a(href=url_for("simple_page.add_sensor"))
+                .btn.pull-right.btn-info Add sensor
+
+        table.table.table-striped
+            thead
+                tr
+                    th #
+                    th Name
+                    th Class
+            tbody
+                each item in sensors
+                        tr
+                            td=item.index
+                            td
+                                a(href=url_for("simple_page.sensor", index=item.index))=item.name
+                            td=item.class

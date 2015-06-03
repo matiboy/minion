@@ -1,6 +1,7 @@
-extends ./base.jade
+extends ./edit.jade
 
 block stylesheets
+    {{ super() }}
     link(rel='stylesheet', href=url_for('simple_page.static', filename='stylesheets/nerve.css'))
 
 block scripts
@@ -18,21 +19,11 @@ block content
         form(method='post', ng-submit='submit()', ng-controller='NervousSystemController')
             .form-group
                 label Name
-                input.form-control(type='text', name='name', placeholder='Enter nervous system name', ng-model='nerve.name')
+                input.form-control(type='text', name='name', placeholder='Enter nervous system name', ng-model='obj.name')
 
             .form-group
                 label Class
-                select.form-control(ng-model='nerve.class', ng-options='c as c for c in availableNerveClasses')
+                select.form-control(ng-model='obj.class', ng-options='c as c for c in availableNerveClasses')
             
-            for system in systems
-                div(ng-show='nerve.class=="#{system['class']}"')
-                    .form-group
-                        label Description
-                        .description=system['description']
-                    for field in system['setup']
-                        .form-group
-                            label=field['message']
-                            if field['type'] == 'input'
-                                input.form-control(ng-model='systems["#{system['class']}"].configuration["#{field['name']}"]')
-
+            {% include "./systems.jade" %}
             button.btn.btn-info(type="submit") Save
