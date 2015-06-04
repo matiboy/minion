@@ -74,11 +74,11 @@ Below are a list of post processors. More details can be found in the respective
 
 #### [Pocketsphinx](./minion/sensing/postprocessors/audio/pocketsphinx/README.md)
 
-| Input type  | Audio data (wav, 1 channel) |
-|-------------|-----------------------------|
-| Output type | Text                        |
+| Input type                  | Output type |
+|-----------------------------|-------------|
+| Audio data (wav, 1 channel) | Text        |
 
-[Pocketsphinx](http://cmusphinx.sourceforge.net/) is one of the choices of speech to text post processors. It's main advantage is that the speech to text process is handled locally on the same device. This means that it is very fast compared to the Google API or API.ai processors.
+[Pocketsphinx](http://cmusphinx.sourceforge.net/) is one of the choices of speech to text post processors. Its main advantage is that the speech to text process is handled locally on the same device. This means that it is very fast compared to the Google API or API.ai processors.
 
 You may want to use [this tool](http://www.speech.cs.cmu.edu/tools/lmtool-new.html) to create your own language model and dictionary.
 
