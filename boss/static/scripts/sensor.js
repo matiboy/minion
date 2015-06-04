@@ -1,4 +1,4 @@
-angular.module('Boss', [])
+angular.module('Boss', ['ui.bootstrap'])
     .controller('SensorController', function($scope, $http) {
         $scope.obj = window.sensor;
         $scope.availableSensorClasses = _.pluck(window.availableSensors, 'class');

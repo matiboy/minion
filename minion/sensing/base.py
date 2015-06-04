@@ -2,6 +2,7 @@ from . import exceptions
 import time
 import multiprocessing
 import minion.core.components
+import minion.core.utils.functions
 import minion.core.utils.module_loading
 import threading
 
@@ -94,24 +95,24 @@ class BaseSensor(minion.core.components.NervousComponent):
 
 
 class ContinuousSensor(BaseSensor):
-    # Key that the constructor will look for either on the class or in the configuration
-    period_attribute = 'period'
-
     def __init__(self, name, nervous_system, configuration={}, preprocessors=[], postprocessors=[], **kwargs):
         super(ContinuousSensor, self).__init__(name, nervous_system, configuration, preprocessors, postprocessors, **kwargs)
-        # Make sure we have a period
-        if not hasattr(self, self.period_attribute) and self.period_attribute not in configuration:
-            raise exceptions.ImproperlyConfigured('Continous sensor requires a sensing period')
-        # Keep the period
-        if self.period_attribute in configuration:
-            self.period = configuration[self.period_attribute]
-        logger.debug('Creating continuous sensor <%s> with period %s', self.name, self.period)
+        logger.debug('Creating continuous sensor <%s> with period %s', self.name, self._get_period())
+
+    @minion.core.utils.functions.configuration_getter
+    def _get_period(self):
+        return 1
+
+    @minion.core.utils.functions.configuration_getter
+    def _get_immediate(self):
+        return True
 
     def run(self):
-        immediate = self.get_configuration('immediate', True)
+        immediate = self._get_immediate()
+        period = self._get_period()
         while True:
             if not immediate:
-                time.sleep(self.period)
+                time.sleep(period)
 
             # Sensor might not be active
             if self.is_active():
@@ -124,4 +125,4 @@ class ContinuousSensor(BaseSensor):
 
             # Pause after
             if immediate:
-                time.sleep(self.period)
+                time.sleep(period)

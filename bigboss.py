@@ -49,13 +49,29 @@ def nerve():
         )
 
 
-@simple_page.route('/save_sensor', methods=['POST'])
+@simple_page.route('/save_object/<component_type>', methods=['POST'], defaults={'index': -1})
+@simple_page.route('/save_object/<component_type>/<index>', methods=['POST'])
 @boss.utils.auth.requires_auth
-def save_sensor():
+def save_object(component_type, index):
     setup = flask.request.get_json()
-    boss.settings.save('sensors', setup)
+    print setup
+    # boss.settings.save('sensors', setup)
 
     return flask.jsonify(status=0)
+
+
+@simple_page.route('/remove_object/<component_type>/<index>', methods=['POST'])
+@boss.utils.auth.requires_auth
+def remove_object(component_type, index):
+    current_settings = flask.g.settings[component_type]
+
+    # 1-based index for readability, to be reconsidered
+    index = int(index) - 1
+    current_settings.pop(index)
+
+    boss.settings.save(component_type, current_settings)
+
+    return flask.redirect(flask.url_for('simple_page.{}'.format(component_type)))
 
 
 @simple_page.route('/sensors')
@@ -70,29 +86,27 @@ def sensors():
         )
 
 
-@simple_page.route('/sensors/create')
-@boss.utils.auth.requires_auth
-def add_sensor():
-    modules = minion.core.configure.modules
-    return flask.render_template('sensor.jade',
-        index=-1,
-        sensor='{}',
-        available_sensors=json.dumps(modules[minion.core.components.Types.SENSOR]),
-        systems=modules[minion.core.components.Types.SENSOR]
-        )
-
-
 @simple_page.route('/sensors/<index>')
+@simple_page.route('/sensors/create', defaults={'index': -1})
 @boss.utils.auth.requires_auth
 def sensor(index):
-    modules = minion.core.configure.modules
     settings = flask.g.settings
+    if index == -1:
+        sensor = {}
+        editing = False
+    else:
+        index = int(index)
+        sensor = settings['sensors'][index-1]
+        editing = True
+    modules = minion.core.configure.modules
     return flask.render_template('sensor.jade',
         index=index,
-        sensor=json.dumps(settings['sensors'][index-1]),
-        editing=True
-        # available_sensors=json.dumps(modules[minion.core.components.Types.SENSOR]),
-        # systems=modules[minion.core.components.Types.SENSOR]
+        sensor=json.dumps(sensor),
+        available_sensors=json.dumps(modules[minion.core.components.Types.SENSOR]),
+        editing=editing,
+        systems=modules[minion.core.components.Types.SENSOR],
+        available_postprocessors=json.dumps(modules[minion.core.components.Types.POST_PROCESSOR]),
+        postprocessors=modules[minion.core.components.Types.POST_PROCESSOR],
         )
 
 app.register_blueprint(simple_page)

@@ -4,7 +4,7 @@ block content
     .container(ng-app='Boss')
         .jumbotron
             h1 Sensors
-            a(href=url_for("simple_page.add_sensor"))
+            a(href=url_for("simple_page.sensor", index=-1))
                 .btn.pull-right.btn-info Add sensor
 
         table.table.table-striped
@@ -13,6 +13,7 @@ block content
                     th #
                     th Name
                     th Class
+                    th
             tbody
                 each item in sensors
                         tr
@@ -20,3 +21,6 @@ block content
                             td
                                 a(href=url_for("simple_page.sensor", index=item.index))=item.name
                             td=item.class
+                            td
+                                form(method="post", action=url_for('simple_page.remove_object', component_type="sensors", index=item.index))
+                                    button.btn.btn-danger(type="submit") Remove

@@ -64,7 +64,7 @@ defines = {
     minion.core.components.Types.SENSOR: [
         {
             'name': 'Heartbeat',
-            'class': 'minion.sensing.heartbear.beat.Heartbeat',
+            'class': 'minion.sensing.heartbeat.beat.Heartbeat',
             'description': '''
 <h3>Repeats a simple command at given intervals</h3>
 <h4>Output: command</h4>
