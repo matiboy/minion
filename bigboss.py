@@ -49,13 +49,22 @@ def nerve():
         )
 
 
-@simple_page.route('/save_object/<component_type>', methods=['POST'], defaults={'index': -1})
-@simple_page.route('/save_object/<component_type>/<index>', methods=['POST'])
+@simple_page.route('/save_object/<component_type>', methods=['POST'])
 @boss.utils.auth.requires_auth
-def save_object(component_type, index):
+def save_object(component_type):
     setup = flask.request.get_json()
-    print setup
-    # boss.settings.save('sensors', setup)
+    components = flask.g.settings.get(component_type, [])
+    # Remove unwanted stuff if need be, this will also help us find out create vs edit
+    try:
+        index = setup['index']
+        del setup['index']
+    except KeyError:
+        components.append(setup)
+    else:
+        index = int(index) - 1
+        components[index] = setup
+
+    boss.settings.save(component_type, components)
 
     return flask.jsonify(status=0)
 
@@ -74,34 +83,40 @@ def remove_object(component_type, index):
     return flask.redirect(flask.url_for('simple_page.{}'.format(component_type)))
 
 
-@simple_page.route('/sensors')
+@simple_page.route('/components/<component_type>')
 @boss.utils.auth.requires_auth
-def sensors():
-    # Let's make sure we don't affect the existing stuff
-    sensors = flask.g.settings.get('sensors', [])
-    for i, x in enumerate(sensors):
+def component_list(component_type):
+    items = flask.g.settings.get(component_type, [])
+    for i, x in enumerate(items):
         x['index'] = i+1
-    return flask.render_template('sensors.jade',
-        sensors=sensors,
+    return flask.render_template('{}.jade'.format(component_type),
+        items=items,
+        component_type=component_type
         )
 
 
-@simple_page.route('/sensors/<index>')
-@simple_page.route('/sensors/create', defaults={'index': -1})
+@simple_page.route('/components/<component_type>/<index>')
+@simple_page.route('/components/<component_type>/create', defaults={'index': -1})
 @boss.utils.auth.requires_auth
-def sensor(index):
+def edit_object(component_type, index):
     settings = flask.g.settings
     if index == -1:
-        sensor = {}
+        obj = {}
         editing = False
     else:
         index = int(index)
-        sensor = settings['sensors'][index-1]
+        obj = settings[component_type][index-1]
+        obj['index'] = index
         editing = True
+
+    return globals()['edit_{}'.format(component_type)](obj, index, editing)
+
+
+def edit_sensors(obj, index, editing):
     modules = minion.core.configure.modules
     return flask.render_template('sensor.jade',
         index=index,
-        sensor=json.dumps(sensor),
+        sensor=json.dumps(obj),
         available_sensors=json.dumps(modules[minion.core.components.Types.SENSOR]),
         editing=editing,
         systems=modules[minion.core.components.Types.SENSOR],

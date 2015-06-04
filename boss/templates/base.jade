@@ -32,7 +32,11 @@ html.no-js
                 li
                     a(href=url_for('simple_page.nerve')) Nervous system
                 li
-                    a(href=url_for('simple_page.sensors')) Sensors
+                    a(href=url_for('simple_page.component_list', component_type='sensors')) Sensors
+                li
+                    a(href=url_for('simple_page.component_list', component_type='commands')) Commands
+                li
+                    a(href=url_for('simple_page.component_list', component_type='actuators')) Actuators
 
 
     block content

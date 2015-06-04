@@ -16,7 +16,10 @@ angular.module('Boss', ['ui.bootstrap'])
 
         $scope.submit = function() {
             $scope.obj.configuration = currentSystems[$scope.obj.class].configuration;
-            $http.post('/save_object/sensor', $scope.obj)
+            _.each($scope.obj.postprocessors, function(p) {
+                p.name = p.class;
+            });
+            $http.post('/save_object/sensors', $scope.obj)
                 .then(function(resp){
                     window.alert('Sensor saved successfully');
                 })
