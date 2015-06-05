@@ -1,0 +1,32 @@
+div(ng-controller="PreprocessorsController")
+    div
+        h4 Add pre processors
+        select(ng-model="pp.class", ng-options="pp as pp for pp in availablePreprocessClasses")
+        for pp in preprocessors
+            div(ng-show='pp.class=="#{pp['class']}"')
+                .row
+                    .col-xs-6
+                        for field in pp['setup']
+                            .form-group
+                                label=field['message']
+                                if field['type'] == 'input'
+                                    input.form-control(ng-model='p["#{pp['class']}"].configuration["#{field['name']}"]')
+                        .btn.btn-success(ng-click="addPreprocessor()") Add
+                    .col-xs-6
+                        .form-group
+                            label Description
+                            .description!=pp['description']
+
+    div
+        h4 Current pre processors
+        ol
+            li(ng-repeat="row in obj.preprocessors")
+                h5(ng-bind="row.name + '(' + row.class + ')'")
+                ul
+                    li(ng-repeat="(k, v) in row.configuration")
+                        b(ng-bind="k + ': '")
+                        span(ng-bind="v")
+
+                .btn.btn-small.btn-danger(ng-click="removePreprocessor($index)") Remove
+
+

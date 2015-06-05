@@ -1,6 +1,7 @@
 import redis
 from .. import base
 import minion.core.components.exceptions
+import minion.core.utils.functions
 
 class BaseIntent(base.BasePreprocessor):
     """
@@ -19,35 +20,38 @@ class BaseIntent(base.BasePreprocessor):
 
     def _setup_redis_client(self):
         """ Creates the redis client according to configuration """
-        return redis.StrictRedis(**{x: self.get_configuration(x) for x in ('host', 'port', 'db')})
+        return redis.StrictRedis(self.get_configuration_dict('host', 'port', 'db'))
 
 
 class KeyBasedIntent(BaseIntent):
     """ Adds a get_key method for further sub classes that need to get a single redis key """
+    @minion.core.utils.functions.configuration_getter
     def get_key(self):
-        return self.get_configuration('key')
+        return None
 
 
 class IntentExists(KeyBasedIntent):
-    """
-        Checks whether the given key exists in the redis client
-    """
     configuration = {
         'host': 'localhost',
         'port': 6379,
-        'db': 0,
-        'key': 'minion:asleep',
+        'db': 0
     }
 
-    def test(self):
-        return self.redis_client.get(self.get_key()) is not None
+    blocking = True
+
+    def _validate_configuration(self):
+        if not self.get_key():
+            raise minion.core.components.exceptions.ImproperlyConfigured('Key is required')
+
+    def _test(self, *args, **kwargs):
+        return self.redis_client.get(self.get_key())
 
 
 class IntentDoesNotExist(IntentExists):
     """
         Checks that the given key does _not_ exist in the redis client
     """
-    def test(self):
+    def _test(self):
         return self.redis_client.get(self.get_key()) is None
 
 
@@ -55,12 +59,13 @@ class IntentEquals(KeyBasedIntent):
     """
         Checks that the given key is equal to the given (constant) value
     """
+    @minion.core.utils.functions.configuration_getter
     def get_value(self):
-        return self.get_configuration('value')
+        return None
 
     def _validate_configuration(self):
         if not self.get_value():
             raise minion.core.components.exceptions.ImproperlyConfigured('Value is required for IntentEquals preprocessor')
 
-    def test(self):
+    def _test(self):
         return self.redis_client.get(self.get_key()) == self.get_value()

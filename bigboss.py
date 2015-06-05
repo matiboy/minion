@@ -112,6 +112,19 @@ def edit_object(component_type, index):
     return globals()['edit_{}'.format(component_type)](obj, index, editing)
 
 
+def edit_actuators(obj, index, editing):
+    modules = minion.core.configure.modules
+    return flask.render_template('actuator.jade',
+        index=index,
+        actuator=json.dumps(obj),
+        available_actuators=json.dumps(modules[minion.core.components.Types.ACTUATOR]),
+        editing=editing,
+        systems=modules[minion.core.components.Types.ACTUATOR],
+        available_preprocessors=json.dumps(modules[minion.core.components.Types.PRE_PROCESSOR]),
+        preprocessors=modules[minion.core.components.Types.PRE_PROCESSOR],
+        )
+
+
 def edit_sensors(obj, index, editing):
     modules = minion.core.configure.modules
     return flask.render_template('sensor.jade',

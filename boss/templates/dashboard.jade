@@ -28,16 +28,18 @@ block content
                             span.badge=sensors_count
             tr
                 td
-                    i.fa.fa-5x.fa-cogs
-                    p Commands
-                    if commands_count > 0
-                        span.badge.ok=commands_count
-                    else
-                        span.badge=commands_count
+                    a(href=url_for('simple_page.component_list', component_type='commands'))
+                        i.fa.fa-5x.fa-cogs
+                        p Commands
+                        if commands_count > 0
+                            span.badge.ok=commands_count
+                        else
+                            span.badge=commands_count
                 td
-                    i.fa.fa-5x.fa-hand-o-up
-                    p Actuators
-                    if actuators_count > 0
-                        span.badge.ok=actuators_count
-                    else
-                        span.badge=actuators_count
+                    a(href=url_for('simple_page.component_list', component_type='actuators'))
+                        i.fa.fa-5x.fa-hand-o-up
+                        p Actuators
+                        if actuators_count > 0
+                            span.badge.ok=actuators_count
+                        else
+                            span.badge=actuators_count

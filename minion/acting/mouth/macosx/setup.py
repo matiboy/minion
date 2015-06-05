@@ -1,4 +1,3 @@
-import inquirer
 import minion.core.components
 
 defines = {
@@ -8,30 +7,12 @@ defines = {
             'class': 'minion.acting.mouth.macosx.say.SimpleSay',
             'default_channel': 'minion:speak',
             'description': '''
-# MacOsx say command
-# Availability: Mac OS X only
-#
-# Uses the built-in "say" command in MacOsx to say stuff
-#
-# Refer to https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/say.1.html
-#
-# Only the voice selection (-v) option is implemented
-#
+<h3>MacOsx say command</h3>
+<h4>Availability: Mac OS X only</h4>
+<p>Uses the built-in "say" command in MacOsx to say stuff</p>
+<p>Refer to the <a href="https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/say.1.html">say documentation</a>
+<p>Only the voice selection (-v) option is implemented</p>
             ''',
-            'questions': [
-                inquirer.List('voice', message='Select a voice', choices=[
-                        'Bruce',
-                        'Agnes',
-                        'Kathy',
-                        'Princess',
-                        'Vicki',
-                        'Victoria',
-                        'Alex',
-                        'Fred',
-                        'Junior',
-                        'Ralph',
-                    ]),
-            ],
             'setup': [
                 {
                     'name': 'voice',

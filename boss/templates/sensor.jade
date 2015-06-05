@@ -16,7 +16,10 @@ block content
     .container(ng-app='Boss', ng-controller='SensorController')
         form(method='post', ng-submit='submit()')
             .jumbotron
-                h1(ng-bind="obj.name")
+                if editing
+                    h1(ng-bind="obj.name")
+                else
+                    h1 New component
                 button.btn.btn-info.pull-right(type="submit") Save
 
             tabset

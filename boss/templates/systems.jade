@@ -8,3 +8,8 @@ for system in systems
                 label=field['message']
                 if field['type'] == 'input'
                     input.form-control(ng-model='systems["#{system['class']}"].configuration["#{field['name']}"]')
+                else 
+                    if field['type'] == 'select'
+                        select.form-control(ng-model='systems["#{system['class']}"].configuration["#{field['name']}"]')
+                            for opt in field['choices']
+                                option(value=opt)=opt

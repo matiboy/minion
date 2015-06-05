@@ -2,6 +2,7 @@ from . import exceptions
 import time
 import multiprocessing
 import minion.core.components
+import minion.preprocessors.exceptions
 import minion.core.utils.functions
 import minion.core.utils.module_loading
 import threading
@@ -58,8 +59,13 @@ class BaseSensor(minion.core.components.NervousComponent):
         # Run all the preprocessors, expect all to return true, otherwise stop
         go_ahead = True
         for p in self.preprocessors:
-            if not p.test():
+            try:
+                p.test()
+            except minion.preprocessors.exceptions.StopProcess:
                 go_ahead = False
+                break
+            except minion.preprocessors.exceptions.ProcessValid:
+                # Means we can go ahead without checking other preprocessors
                 break
         return go_ahead
 

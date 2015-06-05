@@ -13,9 +13,9 @@ The exact same effect can be achieved using commands, but post processors have t
 
 Let's think of an example where a minion instance called Dave (whose role is to be the brain) is located at your house, but you installed a simple Minion instance in the office (named "Jerry"), whose job is only to understand a few simple commands such as "Jerry, is it raining at home?" 
 
-You *could* very well grab the spoken audio using for example a SelectiveMicrophoneListener (always on) and send that audio via the nervous system to the brain, and have an STT command grab that and transcribe it, and then send back the response.
+You *could* very well grab the spoken audio using for example a SelectiveMicrophoneListener (always on) and send that audio via the nervous system to the brain, then have an STT command grab that audio data and transcribe it; finally a command will process that you asked whether it was raining, and then send back the response.
 
-But that means transferring 500Kb of audio before it can be processed. Post processors allow you to perform the STT process before sending a *text* command over the nervous system (network)
+But that means transferring 100Kb of audio before it can be processed. Post processors allow you to perform the STT process before sending a *text* command over the nervous system (network)
 
 Note that if you use STT such as API.ai or Google Speech API, you are still sending the data over the internet, but you would do that from your other minion instance anyway.
 
