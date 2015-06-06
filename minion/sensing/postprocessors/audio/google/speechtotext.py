@@ -1,37 +1,77 @@
 import minion.postprocessors
+import minion.core.utils.functions
 import random
 import requests
 import multiprocessing
 import json
+import six
 
 logger = multiprocessing.get_logger()
 
 
 class GoogleSpeechToText(minion.postprocessors.BasePostprocessor):
-    configuration = {
-        'url': 'http://www.google.com/speech-api/v2/recognize',
-        'lang': 'en-us',
-        'client': 'chromium',
-        'Content-Type': 'audio/x-flac; rate=16000;',
-        'keys': [],
-        'type': 'flac'
-    }
+    url = 'http://www.google.com/speech-api/v2/recognize'
 
-    def process(self, data):
+    @minion.core.utils.functions.configuration_getter
+    def get_url(self):
+        return self.url
+
+    @minion.core.utils.functions.configuration_getter
+    def get_type(self):
+        return 'flac'
+
+    @minion.core.utils.functions.configuration_getter
+    def get_lang(self):
+        return 'en-us'
+
+    @minion.core.utils.functions.configuration_getter
+    def get_client(self):
+        return 'chromium'
+
+    @minion.core.utils.functions.configuration_getter
+    def get_content_type(self):
+        return 'audio/x-flac; rate=16000;'
+
+    @minion.core.utils.functions.configuration_getter
+    def get_keys(self):
+        return []
+
+    def get_key(self):
+        if isinstance(self.get_keys(), six.string_types):
+            return self.get_keys()
+        else:
+            return random.choice(self.get_keys())
+
+    def _validate_config(self):
+        if not self.get_key():
+            raise minion.core.components.ImproperlyConfigured('You need to provide at least one Google Speech API key')
+
+    def _build_request_parameters(self, data):
         params = {
-            'lang': self.configuration['lang'],
-            'client': self.configuration['client'],
-            'key': random.choice(self.configuration['API_KEY']),
+            'lang': self.get_lang(),
+            'client': self.get_client(),
+            'key': self.get_key(),
         }
         headers = {
-            'Content-Type': self.configuration['Content-Type'],
+            'Content-Type': self.get_content_type(),
         }
         files = {
-            'file': ('file.{}'.format(self.configuration['type']), data)
+            'file': ('file.{}'.format(self.get_type()), data)
         }
 
+        return {
+            'params': params,
+            'headers': headers,
+            'files': files,
+        }
+
+    def _get_google_response(self, parameters):
+        return requests.post(self.get_url(), **parameters)
+
+    def process(self, data):
+        request_parameters = self._build_request_parameters(data)
         # TODO handle errors
-        response = requests.post(self.configuration['url'], params=params, headers=headers, files=files)
+        response = self._get_google_response(request_parameters)
 
         lines = response.text.split('\n')
 
@@ -47,5 +87,5 @@ class GoogleSpeechToText(minion.postprocessors.BasePostprocessor):
                 result = results[0]
                 message = result['alternative'][0]['transcript']
                 break
-        logger.debug(message)
+        logger.debug('Decoded message from Google STT: %s', message)
         return message
