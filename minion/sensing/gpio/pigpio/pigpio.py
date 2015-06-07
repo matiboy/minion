@@ -14,7 +14,7 @@ class Reader(minion.sensing.base.ContinuousSensor):
     Generic GPIO sensor using pigpio
     Child classes expect an instance of pigpiod to be running (likely as root)
     """
-    def __init__(self, name, configuration):
+    def __init__(self, name, nervous_system, configuration={}, preprocessors=[], postprocessors=[], **kwargs):
         super(Reader, self).__init__(name, configuration)
         self.pi = self._setup_pi()
         # Set the pin to input

@@ -13,8 +13,8 @@ class GpioPostprocessor(minion.sensing.postprocessors.BasePostprocessor):
         try:
             new_value, old_value = data
         except ValueError:
-            raise minion.sensing.exceptions.DataReadError('Expecting new and old values, got {}'.format(data))        
-        
+            raise minion.sensing.exceptions.DataReadError('Expecting new and old values, got {}'.format(data))
+
         return new_value, old_value
 
 class ChangeOnly(GpioPostprocessor):
