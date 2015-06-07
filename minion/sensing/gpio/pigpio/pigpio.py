@@ -25,6 +25,9 @@ class Reader(minion.sensing.base.ContinuousSensor):
     def _setup_pi(self):
         return pigpio.pi()
 
+    def get_publish_channel(self):
+        return 'minion:proximity'
+
     @minion.core.utils.functions.configuration_getter
     def _get_pin(self):
         return 14
