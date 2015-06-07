@@ -19,7 +19,7 @@ class Reader(minion.sensing.base.ContinuousSensor):
         self.pi = self._setup_pi()
         # Set the pin to input
         self.pi.set_mode(self._get_pin(), pigpio.INPUT)
-        self.pi.set_pull_up_or_down(self._get_pin(), getattr(pigpio, self._get_pud()))
+        self.pi.set_pull_up_down(self._get_pin(), getattr(pigpio, self._get_pud()))
         self._old_state = None
 
     def _setup_pi(self):
