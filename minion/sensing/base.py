@@ -1,11 +1,12 @@
 from . import exceptions
-import time
-import multiprocessing
 import minion.core.components
-import minion.preprocessors.exceptions
 import minion.core.utils.functions
 import minion.core.utils.module_loading
+import minion.preprocessors.exceptions
+import minion.sensing.exceptions
+import multiprocessing
 import threading
+import time
 
 logger = multiprocessing.get_logger()
 
@@ -85,7 +86,10 @@ class BaseSensor(minion.core.components.NervousComponent):
     def post_process(self, data):
         logger.debug('Sensor data received, preparing to post process')
         for p in self.postprocessors:
-            data = p.process(data)
+            try:
+                data = p.process(data)
+            except minion.sensing.exceptions.DataUnavailable:
+                return
 
         # Use nervous system to pass on data
         self.publish_on_nervous_system(data)
