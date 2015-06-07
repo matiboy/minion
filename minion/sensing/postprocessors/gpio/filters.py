@@ -8,7 +8,7 @@ logger = multiprocessing.get_logger()
 
 
 class GpioPostprocessor(minion.sensing.postprocessors.BasePostprocessor):
-    def validate_raw_date(self, data):
+    def validate_raw_data(self, data):
         # We're expecting data to contain new and old values
         try:
             new_value, old_value = data
@@ -16,6 +16,7 @@ class GpioPostprocessor(minion.sensing.postprocessors.BasePostprocessor):
             raise minion.sensing.exceptions.DataReadError('Expecting new and old values, got {}'.format(data))
 
         return new_value, old_value
+
 
 class ChangeOnly(GpioPostprocessor):
     def process(self, data):
