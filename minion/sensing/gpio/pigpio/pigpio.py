@@ -30,7 +30,7 @@ class Reader(minion.sensing.base.ContinuousSensor):
         return 14
 
     @minion.core.utils.functions.configuration_getter
-    def _get_pull_up_or_down(self):
+    def _get_pud(self):
         return 'PUD_OFF'
 
     def sense(self):
