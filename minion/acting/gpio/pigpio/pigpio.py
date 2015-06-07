@@ -19,6 +19,7 @@ class GPIOActuator(minion.acting.base.BaseActuator):
     def __init__(self, name, configuration, channels=[], **kwargs):
         super(GPIOActuator, self).__init__(name, configuration, channels, **kwargs)
         self.pi = self._setup_pi()
+        self.pi.set_mode(self._get_pin(), pigpio.OUTPUT)
 
     def _setup_pi(self):
         return pigpio.pi()
