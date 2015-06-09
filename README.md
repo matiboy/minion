@@ -24,7 +24,7 @@ Without going into the awesomeness of home automation and voice control, why cre
 
 4. Agnostic (mostly): Other tools tend to decide which device and library you need to use. One of the most advanced tool available, Jasper, is [specifically designed for the Raspberry Pi](http://jasperproject.github.io/documentation/hardware/). While we are huge fans of the Pi, Minion aims to work on any OS - or rather on several, distributed OSes - using **your** preferred tools. If you like [SoX](http://sox.sourceforge.net/) more than [FFmpeg](https://www.ffmpeg.org/) to record, it needs to be possible. Minion is written in Python and its modular architecture means that it is OS and library agnostic.
 
-5. As megalomaniac as the [Big Boss](./boss)
+5. [Big Boss](./boss): Megalomaniac web based management of Minion instances
 
 ## Architecture
 Minion requires 4 components to function fully:
