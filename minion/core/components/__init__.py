@@ -34,6 +34,14 @@ class BaseComponent(object):
     def get_configuration_dict(self, *args):
         return {x: self.get_configuration(x) for x in args}
 
+    def requires_configuration_key(self, key):
+        if key not in self._configuration:
+            raise exceptions.ImproperlyConfigured('Key <{}> is required'.format(key))
+
+    def requires_non_empty_configuration(self, key):
+        if not self.get_configuration(key):
+            raise exceptions.ImproperlyConfigured('Configuration for <{}> should not be empty'.format(key))
+
     def _validate_configuration(self):
         """
             Should raise ImproperlyConfigured if any issue
