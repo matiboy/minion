@@ -40,8 +40,7 @@ class IntentExists(KeyBasedIntent):
     blocking = True
 
     def _validate_configuration(self):
-        if not self.get_key():
-            raise minion.core.components.exceptions.ImproperlyConfigured('Key is required')
+        self.requires_non_empty_configuration('key')
 
     def _test(self, *args, **kwargs):
         return self.redis_client.get(self.get_key())
@@ -64,8 +63,7 @@ class IntentEquals(KeyBasedIntent):
         return None
 
     def _validate_configuration(self):
-        if not self.get_value():
-            raise minion.core.components.exceptions.ImproperlyConfigured('Value is required for IntentEquals preprocessor')
+        self.requires_configuration_key('value')
 
     def _test(self):
         return self.redis_client.get(self.get_key()) == self.get_value()
