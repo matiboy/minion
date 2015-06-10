@@ -5,7 +5,6 @@ defines = {
         {
             'name': 'Raspberry Pi GPIO Reader',
             'class': 'minion.sensing.gpio.pigpio.pigpio.Reader',
-            'default_channel': 'minion:gpio',
             'description': '''
 <h3>Raspberry Pi GPIO sensor</h3>
 <h4>Availability: Raspberry Pi and the likes</h4>

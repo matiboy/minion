@@ -10,17 +10,15 @@ GPIO
 
 ## Description
 
-Filters out GPIO sensors' outputs. This is to avoid flooding the nervous system with information when potentially Minion doesn't need to know about the state of a GPIO pin at all times. It typically allows the output of the [always listening GPIO sensor](/minion/sensing/gpio/pigpio) to only react on changes, when outcome is high only or low only, or a combination of those.
+Filters out GPIO sensors' outputs. This is to avoid flooding the nervous system with information when potentially Minion doesn't need to know about the state of a GPIO pin at all times. It typically allows the output of the [continuous GPIO sensor](/minion/sensing/gpio/pigpio) to only react on changes, when outcome is high only or low only, or a combination of those.
 
 This means it is quite easy to trigger a command only when e.g. the pin changed from low to high.
 
 ## Classes
 
-All the below classes raise a `DataReadError` if they do not receive a `new_value, old_value` tuple as input data.
-
 ### minion.sensing.postprocessors.gpio.filters.ChangeOnly
 
-Raises a `DataUnavaible` exception if new and old values are equal. Only change will be passed on to the next processor (or the nervous system)
+Raises a `DataUnavaible` exception if new and old values are equal. Only change will be passed on to the next processor (or the nervous system). This is actually a [StateChange](/minion/sensing/postprocessors/state) post processor
 
 ### minion.sensing.postprocessors.gpio.filters.HighOnly
 

@@ -20,7 +20,6 @@ class Reader(minion.sensing.base.ContinuousSensor):
         # Set the pin to input
         self.pi.set_mode(self._get_pin(), pigpio.INPUT)
         self.pi.set_pull_up_down(self._get_pin(), getattr(pigpio, self._get_pud()))
-        self._old_state = None
 
     def _setup_pi(self):
         return pigpio.pi()
@@ -36,11 +35,10 @@ class Reader(minion.sensing.base.ContinuousSensor):
     def _get_pud(self):
         return 'PUD_OFF'
 
+    def _validate_configuration(self):
+        self.requires_configuration_key('pin')
+        self.requires_non_empty_configuration('pin')
+
     def sense(self):
-        old_state = self._old_state
-        new_state = self.pi.read(self._get_pin())
-
-        self._old_state = new_state
-
         # Always return, let the post processors decide what is what
-        return new_state, old_state
+        return self.pi.read(self._get_pin())

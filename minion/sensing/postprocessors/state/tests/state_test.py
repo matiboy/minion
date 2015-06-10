@@ -1,6 +1,5 @@
 import unittest
 from .. import state
-import mock
 import minion.core.components.exceptions
 import minion.sensing.exceptions
 import sure # though lint complains that it's never used this is needed
@@ -85,6 +84,7 @@ class StateEqualsConfiguration(unittest.TestCase):
         """Should not raise as long as a is provided, even an empty one"""
         state.StateEquals.when.called_with('dsadas', {'value': None}).shouldnt.throw(minion.core.components.exceptions.ImproperlyConfigured)
 
+
 class StateEquals(unittest.TestCase):
     def setUp(self):
         self.pp = state.StateEquals('dsda', {'value': 1})
@@ -96,3 +96,37 @@ class StateEquals(unittest.TestCase):
     def test_goes_through_value(self):
         """If value matches, pass"""
         self.pp.process.when.called_with(1).shouldnt.throw(minion.sensing.exceptions.DataUnavailable)
+
+
+class StateWithinConfiguration(unittest.TestCase):
+    def test_no_values(self):
+        """Should raise if no list of values is provided, or provided as something other than a list"""
+        state.StateWithin.when.called_with('dsadas', {}).should.throw(minion.core.components.exceptions.ImproperlyConfigured)
+        state.StateWithin.when.called_with('dsadas', {'values': {'a': 42}}).should.throw(minion.core.components.exceptions.ImproperlyConfigured)
+        state.StateWithin.when.called_with('dsadas', {'values': 'harlo'}).should.throw(minion.core.components.exceptions.ImproperlyConfigured)
+
+    def test_ok(self):
+        """Should not raise as long as a list of values are provided"""
+        state.StateWithin.when.called_with('dsadas', {'values': [1, 2, 3]}).shouldnt.throw(minion.core.components.exceptions.ImproperlyConfigured)
+
+
+class StateWithin(unittest.TestCase):
+    def setUp(self):
+        self.pp = state.StateWithin('dsda', {'values': ['a', 'b', 'c']})
+
+    def test_raises_if_invalid_data(self):
+        """It should raise an unreadable data error if the data passed is anything besides a string, float, int or a list"""
+        self.pp.process.when.called_with({}).should.throw(minion.sensing.exceptions.DataReadError)
+
+    def test_raises_on_value_outside(self):
+        """If any value outside authorized, raise"""
+        self.pp.process.when.called_with('fsd').should.throw(minion.sensing.exceptions.DataUnavailable)
+        self.pp.process.when.called_with(['a', 'd']).should.throw(minion.sensing.exceptions.DataUnavailable)
+
+    def test_goes_through_value(self):
+        """If all values are within, pass"""
+        self.pp.process.when.called_with(['a', 'b']).shouldnt.throw(minion.sensing.exceptions.DataUnavailable)
+
+    def test_goes_through_single_value(self):
+        """If the value is within, pass"""
+        self.pp.process.when.called_with('a').shouldnt.throw(minion.sensing.exceptions.DataUnavailable)
