@@ -1,6 +1,7 @@
 from .. import base
 import datetime
 import minion.core.components.exceptions
+import minion.core.utils.functions
 
 
 def _get_now(self):
@@ -12,12 +13,20 @@ class ActiveBetweenTimes(base.BasePreprocessor):
     def __init__(self, configuration):
         super(ActiveBetweenTimes, self).__init__(configuration)
 
+    @minion.core.utils.functions.configuration_getter
+    def get_start_time(self):
+        return None
+
+    @minion.core.utils.functions.configuration_getter
+    def get_end_time(self):
+        return None
+
     def _validate_configuration(self):
         for key in ('start_time', 'end_time'):
-            t = self.get_configuration(key)
-            # Make sure we have a config value
-            if not t:
-                raise minion.core.components.exceptions.ImproperlyConfigured('<{}> is required'.format(key))
+            self.requires_configuration_key(key)
+            self.requires_non_empty_configuration(key)
+            # TODO: That's ugly but using a string works well with requires above
+            t = getattr(self, 'get_{}'.format(key))()
 
             # Split at ':'
             hour, _, minute = t.partition(':')
@@ -30,6 +39,6 @@ class ActiveBetweenTimes(base.BasePreprocessor):
 
             setattr(self, key, datetime.time(hour, minute))
 
-    def test(self):
+    def _test(self):
         now = _get_now()
         return now > self.start_time and now < self.end_time

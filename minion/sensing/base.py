@@ -16,6 +16,7 @@ class BaseSensor(minion.core.components.NervousComponent):
 
     def __init__(self, name, nervous_system, configuration={}, preprocessors=[], postprocessors=[], **kwargs):
         super(BaseSensor, self).__init__(name, nervous_system, configuration)
+
         self.nervous_system = nervous_system
         processors = []
         for p in postprocessors:
@@ -76,6 +77,7 @@ class BaseSensor(minion.core.components.NervousComponent):
             self.post_process(data)
         return
 
+    @minion.core.utils.functions.configuration_getter
     def get_publish_channel(self):
         """
             Publish channel override
@@ -111,21 +113,55 @@ class ContinuousSensor(BaseSensor):
 
     @minion.core.utils.functions.configuration_getter
     def _get_period(self):
-        return 1
+        """Configuration getter than falls back to class value or 0 if all that failed"""
+        try:
+            # Could be class level
+            return self.period
+        except AttributeError:
+            # Defaut to immediate?
+            return 0
 
     @minion.core.utils.functions.configuration_getter
     def _get_immediate(self):
         return True
 
+    def _get_inactive_period(self):
+        """
+        Returns the second value of period if it is an array, the get_value period otherwise
+        Parses to a float; raises if invalid value
+        """
+        period = self._get_period()
+        # Might have a list of 2 items
+        try:
+            _, inactive = period
+        except TypeError:
+            inactive = period
+        return float(inactive)
+
+    def _get_active_period(self):
+        period = self._get_period()
+        # Might have a list of 2 items
+        try:
+            active, _ = period
+        except TypeError:
+            active = period
+        return float(active)
+
     def run(self):
         immediate = self._get_immediate()
-        period = self._get_period()
         while True:
+            is_active = self.is_active()
+            # Waiting period depends on active or not (if 2 values are provided)
+            if is_active:
+                period = self._get_active_period()
+            else:
+                period = self._get_inactive_period()
+
+            # Sensor might not be active
             if not immediate:
                 time.sleep(period)
 
-            # Sensor might not be active
-            if self.is_active():
+            if is_active:
                 try:
                     data = self.sense()
                 except exceptions.DataUnavailable:

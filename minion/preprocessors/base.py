@@ -22,7 +22,6 @@ class BasePreprocessor(minion.core.components.BaseComponent):
             self.fail()
         return self._process(*args, **kwargs)
 
-
     def _process(self, *args, **kwargs):
         return args, kwargs
 

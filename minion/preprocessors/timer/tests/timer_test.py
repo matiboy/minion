@@ -43,14 +43,14 @@ class TimePreprocessorTestMethod(unittest.TestCase):
     def test_earlier_than_start(self, mock_get_now):
         """ Should return false if start is after now """
         pp = timer.ActiveBetweenTimes({'start_time': '11:00', 'end_time': '20:00'})
-        pp.test().should_not.be.ok
+        pp._test().should_not.be.ok
 
     def test_later_than_end(self, mock_get_now):
         """ Should return false if end is before now """
         pp = timer.ActiveBetweenTimes({'start_time': '5:00', 'end_time': '10:00'})
-        pp.test().should_not.be.ok
+        pp._test().should_not.be.ok
 
     def test_within_range(self, mock_get_now):
         """ Should return false if end is before now """
         pp = timer.ActiveBetweenTimes({'start_time': '10:00', 'end_time': '13:00'})
-        pp.test().should.be.ok
+        pp._test().should.be.ok
