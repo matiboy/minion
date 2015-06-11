@@ -125,12 +125,12 @@ class Minion(object):
 
                         logger.debug('Command <%s> can handle command %s', c, command)
                         c.understand(self.nervous_system, command, *command_details)
-
-                elif channel in actuator_channels:
+                # TODO Should we accept that a channel can be both command and actuator? This can lead to rather annoying loops....
+                if channel in actuator_channels:
                     for actuator in self.get_actuators():
                         if actuator.can_handle(m.get_channel()):
                             actuator.preprocess_then_act(m.get_message())
-                else:
-                    logger.info('Message got lost in translation: %s', m)
+                # else:
+                #     logger.info('Message got lost in translation: %s', m)
 
             time.sleep(self.loop_period)

@@ -35,7 +35,7 @@ class GPIOActuator(minion.acting.base.BaseActuator):
         self.pi.write(self._get_pin(), 0)
 
     def wait(self, duration):
-        time.sleep(duration)
+        time.sleep(float(duration))
 
 
 class RunCommands(GPIOActuator):
@@ -97,7 +97,7 @@ class OnThenOff(RunCommands):
 
     def act(self, *args, **kwargs):
         # TODO Why is the threading handled at this particular level?
-        t = threading.Thread(target=super(OnThenOff.act))
+        t = threading.Thread(target=super(OnThenOff, self).act)
         t.start()
 
 
@@ -114,5 +114,5 @@ class OffThenOn(RunCommands):
 
     def act(self, *args, **kwargs):
         # TODO Why is the threading handled at this particular level?
-        t = threading.Thread(target=super(OffThenOn.act))
+        t = threading.Thread(target=super(OffThenOn, self).act)
         t.start()
