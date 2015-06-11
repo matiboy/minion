@@ -1,4 +1,5 @@
 import minion.core.components
+import minion.core.utils
 import multiprocessing
 import subprocess
 
@@ -12,13 +13,40 @@ class BaseActuator(minion.core.components.BaseComponent):
     """
     configuration = {}
 
-    def __init__(self, name, configuration, channels=[], **kwargs):
+    def __init__(self, name, configuration, channels=[], preprocessors=[], **kwargs):
         super(BaseActuator, self).__init__(name, configuration)
         self.channels = channels
         logger.info('Actuator <%s> created with configuration %s. Able to handle channels %s', name, self._configuration, ', '.join(channels))
 
+        processors = []
+        for p in preprocessors:
+            try:
+                c = minion.core.utils.module_loading.import_string(p['class'])
+            except ImportError:
+                logger.critical('Unable to import {}'.format(p['class']))
+            else:
+                processors.append(c(p.get('configuration', {})))
+
+        self.preprocessors = processors
+
     def can_handle(self, channel, **kwargs):
         return channel in self.channels
+
+    def preprocess_then_act(self, *args, **kwargs):
+        # Go through the preprocessors
+        go_ahead = True
+        for p in self.preprocessors:
+            try:
+                p.test()
+            except minion.preprocessors.exceptions.StopProcess:
+                go_ahead = False
+                break
+            except minion.preprocessors.exceptions.ProcessValid:
+                # Means we can go ahead without checking other preprocessors
+                break
+
+        if go_ahead:
+            self.act(*args, **kwargs)
 
     def act(self, *args, **kwargs):
         raise NotImplementedError('Act needs to be implemented in actuator')

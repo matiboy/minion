@@ -129,7 +129,7 @@ class Minion(object):
                 elif channel in actuator_channels:
                     for actuator in self.get_actuators():
                         if actuator.can_handle(m.get_channel()):
-                            actuator.act(m.get_message())
+                            actuator.preprocess_then_act(m.get_message())
                 else:
                     logger.info('Message got lost in translation: %s', m)
 
