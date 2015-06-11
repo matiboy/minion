@@ -4,7 +4,7 @@ import minion.core.components.exceptions
 import minion.core.utils.functions
 
 
-def _get_now(self):
+def _get_now():
     """ Simply get now date time. Makes testing easier since datetime.datetime can't be mocked in python<3.5 """
     return datetime.datetime.now().time()
 
