@@ -10,6 +10,8 @@ def _get_now():
 
 
 class ActiveBetweenTimes(base.BasePreprocessor):
+    blocking = True
+
     def __init__(self, configuration):
         super(ActiveBetweenTimes, self).__init__(configuration)
 

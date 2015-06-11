@@ -58,7 +58,7 @@ class BaseSensor(minion.core.components.NervousComponent):
         return
 
     def is_active(self):
-        # Run all the preprocessors, expect all to return true, otherwise stop
+        # Run all the preprocessors
         go_ahead = True
         for p in self.preprocessors:
             try:
