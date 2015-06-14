@@ -1,0 +1,91 @@
+Language model created by QuickLM on Sun Jun 14 00:04:21 EDT 2015
+Copyright (c) 1996-2010 Carnegie Mellon University and Alexander I. Rudnicky
+
+The model is in standard ARPA format, designed by Doug Paul while he was at MITRE.
+
+The code that was used to produce this language model is available in Open Source.
+Please visit http://www.speech.cs.cmu.edu/tools/ for more information
+
+The (fixed) discount mass is 0.5. The backoffs are computed using the ratio method.
+This model based on a corpus of 11 sentences and 19 words
+
+\data\
+ngram 1=19
+ngram 2=28
+ngram 3=21
+
+\1-grams:
+-0.8931 </s> -0.3010
+-0.8931 <s> -0.2416
+-1.9345 DOWN -0.2416
+-1.9345 LOUD -0.2416
+-1.9345 LOUDER -0.2416
+-1.6335 MUSIC -0.2416
+-1.9345 NEXT -0.2908
+-1.9345 NO -0.2416
+-1.9345 NOT -0.2960
+-1.9345 PLAY -0.2908
+-1.9345 PREVIOUS -0.2908
+-1.6335 SHUFFLE -0.2908
+-1.9345 SO -0.2960
+-1.9345 SOFTER -0.2416
+-1.6335 SONG -0.2416
+-1.9345 STOP -0.2908
+-1.9345 UP -0.2416
+-1.6335 VOLUME -0.2908
+-1.9345 YES -0.2416
+
+\2-grams:
+-1.3424 <s> LOUDER 0.0000
+-1.3424 <s> NEXT 0.0000
+-1.3424 <s> NOT 0.0000
+-1.3424 <s> PLAY 0.0000
+-1.3424 <s> PREVIOUS 0.0000
+-1.0414 <s> SHUFFLE 0.0000
+-1.3424 <s> SOFTER 0.0000
+-1.3424 <s> STOP 0.0000
+-1.0414 <s> VOLUME 0.0000
+-0.3010 DOWN </s> -0.3010
+-0.3010 LOUD </s> -0.3010
+-0.3010 LOUDER </s> -0.3010
+-0.3010 MUSIC </s> -0.3010
+-0.3010 NEXT SONG 0.0000
+-0.3010 NO </s> -0.3010
+-0.3010 NOT SO 0.0000
+-0.3010 PLAY MUSIC 0.0000
+-0.3010 PREVIOUS SONG 0.0000
+-0.6021 SHUFFLE NO 0.0000
+-0.6021 SHUFFLE YES 0.0000
+-0.3010 SO LOUD 0.0000
+-0.3010 SOFTER </s> -0.3010
+-0.3010 SONG </s> -0.3010
+-0.3010 STOP MUSIC 0.0000
+-0.3010 UP </s> -0.3010
+-0.6021 VOLUME DOWN 0.0000
+-0.6021 VOLUME UP 0.0000
+-0.3010 YES </s> -0.3010
+
+\3-grams:
+-0.3010 <s> LOUDER </s>
+-0.3010 <s> NEXT SONG
+-0.3010 <s> NOT SO
+-0.3010 <s> PLAY MUSIC
+-0.3010 <s> PREVIOUS SONG
+-0.6021 <s> SHUFFLE NO
+-0.6021 <s> SHUFFLE YES
+-0.3010 <s> SOFTER </s>
+-0.3010 <s> STOP MUSIC
+-0.6021 <s> VOLUME DOWN
+-0.6021 <s> VOLUME UP
+-0.3010 NEXT SONG </s>
+-0.3010 NOT SO LOUD
+-0.3010 PLAY MUSIC </s>
+-0.3010 PREVIOUS SONG </s>
+-0.3010 SHUFFLE NO </s>
+-0.3010 SHUFFLE YES </s>
+-0.3010 SO LOUD </s>
+-0.3010 STOP MUSIC </s>
+-0.3010 VOLUME DOWN </s>
+-0.3010 VOLUME UP </s>
+
+\end\

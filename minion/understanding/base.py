@@ -1,8 +1,10 @@
+from . import operations
 import re
 import multiprocessing
 import minion.understanding.exceptions
 import minion.core.components
 import minion.core.components.exceptions
+import minion.core.utils.functions
 import threading
 
 logger = multiprocessing.get_logger()
@@ -48,7 +50,12 @@ class BaseCommand(minion.core.components.BaseComponent):
     def is_blocking_command(self):
         return False
 
+    @minion.core.utils.functions.configuration_getter
+    def get_action(self):
+        return ''
+
     def get_command(self):
+        """Deprecated: Should use get_action instead"""
         return self.get_configuration('action')
 
     def matches(self, command):
@@ -68,6 +75,23 @@ class BaseCommand(minion.core.components.BaseComponent):
 
     def __str__(self):
         return self.name or self.__class__.__name__
+
+
+class RedirectCommand(BaseCommand):
+    """
+    A command type that does nothing but redirect input to corresponding output channel
+
+    If unspecified on the class, the output is exactly equal to the input
+    """
+    def _get_output(self, original):
+        try:
+            return self.output
+        except AttributeError:
+            return original
+
+    def _understand(self, original_command, *commands):
+        print 'GFDGJFDKGJDFKGFJGKDJGF', self.get_action(), self._get_output(original_command)
+        return operations.UnderstandingOperation(self.get_action(), self._get_output(original_command))
 
 
 class ParsedResultCommand(BaseCommand):
