@@ -90,7 +90,6 @@ class RedirectCommand(BaseCommand):
             return original
 
     def _understand(self, original_command, *commands):
-        print 'GFDGJFDKGJDFKGFJGKDJGF', self.get_action(), self._get_output(original_command)
         return operations.UnderstandingOperation(self.get_action(), self._get_output(original_command))
 
 

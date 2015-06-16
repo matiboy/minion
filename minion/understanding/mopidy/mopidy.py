@@ -51,3 +51,7 @@ class VolumeUp(MopidyCommand):
 
 class VolumeDown(MopidyCommand):
     output = 'volume_down'
+
+
+class Mute(MopidyCommand):
+    output = 'mute'

@@ -108,6 +108,9 @@ class Mopidy(minion.acting.base.BaseActuator):
 
         self._set_volume(calculate_volume)
 
+    def mute(self, rest):
+        self._process_request('core.mixer.set_volume', [0])
+
     def volume_down(self, rest):
         def calculate_volume(v):
             return max(v-10, 0)
