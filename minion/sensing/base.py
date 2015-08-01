@@ -134,7 +134,7 @@ class ContinuousSensor(BaseSensor):
         # Might have a list of 2 items
         try:
             _, inactive = period
-        except TypeError:
+        except (TypeError, ValueError):
             inactive = period
         return float(inactive)
 
@@ -143,7 +143,7 @@ class ContinuousSensor(BaseSensor):
         # Might have a list of 2 items
         try:
             active, _ = period
-        except TypeError:
+        except (TypeError, ValueError):
             active = period
         return float(active)
 

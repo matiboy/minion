@@ -24,7 +24,9 @@ class ApiaiBaseCommand(minion.understanding.base.BaseCommand):
         try:
             command = json.loads(command)
             action = command['action']
-        except (ValueError, KeyError) as e:
+        except (ValueError, KeyError, TypeError) as e:
+            # TypeError could be from command being json loadable but being a dict
+            # The rest would be from Json parsing
             logger.debug(e)
             raise minion.understanding.exceptions.DoesNotMatch
 
