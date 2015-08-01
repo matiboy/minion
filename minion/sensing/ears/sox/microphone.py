@@ -2,6 +2,7 @@ import minion.sensing.base
 import subprocess
 import tempfile
 import multiprocessing
+import minion.core.utils
 
 
 logger = multiprocessing.get_logger()
@@ -96,5 +97,5 @@ class MicrophoneSelectiveListener(MicrophoneListener):
 
     def _build_sox_command(self, f):
         command = '/usr/bin/rec {options} {tempfile} rate {rate} silence {silence_pre_trim} {silence_pre_duration} {silence_pre_level} {silence_post_trim} {silence_post_duration} {silence_post_level}'.format(tempfile=f.name, **self._configuration)
-        logger.debug(command)
+        minion.core.utils.console.console_info(command)
         return command

@@ -47,4 +47,5 @@ class DurationLimit(minion.sensing.postprocessors.BasePostprocessor):
                     return reduced_file.read()
 
     def _build_sox_call(self, duration, original, target):
-        return '/usr/bin/sox {} {} trim {} {}'.format(original.name, target.name, duration, duration+1)
+        command = '/usr/bin/sox {} {} trim {} {}'.format(original.name, target.name, duration, duration+1)
+        return command

@@ -46,6 +46,7 @@ defines = {
             ],
             'requirements': (
                 'flask',
+                'flask-cors'
             )
         }
     ]

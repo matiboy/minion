@@ -4,6 +4,7 @@ import minion.sensing.postprocessors
 import minion.sensing.exceptions
 import minion.core.components.exceptions
 import multiprocessing
+import minion.core.utils
 
 logger = multiprocessing.get_logger()
 
@@ -94,12 +95,16 @@ class ApiaiSpeechToText(minion.sensing.postprocessors.BasePostprocessor):
         self.SUBSCRIBTION_KEY = self.get_configuration('SUBSCRIBTION_KEY')
 
         # Select the parser according to configuration or default to simple parser
-        parser_class = self.get_configuration('parser', 'simple')
+        parser_class = self._get_parser()
         self.parser = PARSERS[parser_class]()
         # Used for selected actions parser
         # TODO Do we really want to set this on the object and not on the parser?
         self.selected_actions = self.get_configuration('selected_actions', [])
         self.ai = apiai.ApiAI(self.CLIENT_ACCESS_TOKEN, self.SUBSCRIBTION_KEY)
+
+    @minion.core.utils.functions.configuration_getter
+    def _get_parser(self):
+        return 'simple'
 
     def _validate_configuration(self):
         if not self.get_configuration('CLIENT_ACCESS_TOKEN'):
