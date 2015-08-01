@@ -4,6 +4,7 @@ import minion.core.utils.functions
 import minion.sensing.base
 import multiprocessing
 import six
+import flask.ext.cors
 
 logger = multiprocessing.get_logger()
 
@@ -33,6 +34,10 @@ class HttpServer(minion.sensing.base.BaseSensor):
     def _get_channels(self):
         return []
 
+    @minion.core.utils.functions.configuration_getter
+    def _get_allow_cross_origin(self):
+        return False
+
     def get_publish_channel(self, data=None):
         """
         Use channel from POST data is available, leave it to nervous system otherwise
@@ -54,16 +59,20 @@ class HttpServer(minion.sensing.base.BaseSensor):
         self.nervous_system.publish(channel=self.get_publish_channel(data), message=data)
 
     def _add_route(self, app, route):
-        @app.route(route, methods=["POST"])
         def r():
             data = flask.request.form.copy()
             logger.debug('POST data received: %s', data)
             self.post_process(data)
             return 'Ok'
 
+        # if self._get_allow_cross_origin():
+        #    r = flask.ext.cors.cross_origin(r)
+        app.route(route, methods=["POST"])(r)
+
     def _build_app(self):
         app = flask.Flask(self.name)
-
+        if self._get_allow_cross_origin():
+            flask.ext.cors.CORS(app)
         # Could be a single route
         route = self._get_route()
         if isinstance(route, six.string_types):
