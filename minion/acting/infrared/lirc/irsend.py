@@ -17,4 +17,4 @@ class IrsendActuator(minion.acting.base.ShellCommandActuator):
         return 'astro'
 
     def _build_command(self, *args, **kwargs):
-        return ['irsend', 'SEND_ONCE', self._get_remote_control_name()] + args
+        return ['irsend', 'SEND_ONCE', self._get_remote_control_name()] + list(args)
