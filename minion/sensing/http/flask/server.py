@@ -5,14 +5,33 @@ import minion.sensing.base
 import multiprocessing
 import six
 import flask.ext.cors
+import json
 
 logger = multiprocessing.get_logger()
 
+class PassthroughEncoder(object):
+    def encode(self, data):
+        return data
+
+class JSONEncoder(object):
+    def encode(self, data):
+
+        return json.dumps(data)
+
+ENCODERS = {
+    'passthrough': PassthroughEncoder,
+    'json': JSONEncoder
+}
 
 class HttpServer(minion.sensing.base.BaseSensor):
     def __init__(self, name, nervous_system, configuration={}, preprocessors=[], postprocessors=[], **kwargs):
         super(HttpServer, self).__init__(name, nervous_system, configuration, preprocessors, postprocessors, **kwargs)
         self.app = self._build_app()
+        self.encoder = ENCODERS[self._get_encoder()]()
+
+    @minion.core.utils.functions.configuration_getter
+    def _get_encoder(self):
+        return 'passthrough'
 
     @minion.core.utils.functions.configuration_getter
     def _get_route(self):
@@ -40,14 +59,18 @@ class HttpServer(minion.sensing.base.BaseSensor):
 
     def get_publish_channel(self, data=None):
         """
-        Use channel from POST data is available, leave it to nervous system otherwise
+        Use channel from POST data if available, leave it to nervous system otherwise
 
         Data will be None when Minion core is gathering channels to listen to.
         Potential channels should therefore be provided in the configuration otherwise there is a chance that a message will be published but be unheard
         """
         if data is None:
             return self._get_channels()
-        channel = data.get('channel', None)
+        # Could be that data is not a dict anymore
+        try:
+            channel = data.get('channel', None)
+        except AttributeError:
+            return self._get_channels()
         if channel not in self._get_channels():
             minion.core.utils.console.console_warn('Publish channel <{}> is not in declared channels, message might not be received'.format(channel))
         return channel
@@ -56,17 +79,18 @@ class HttpServer(minion.sensing.base.BaseSensor):
         """
         Override default behavior since publish channel will depend on data
         """
-        self.nervous_system.publish(channel=self.get_publish_channel(data), message=data)
+        self.nervous_system.publish(channel=self.get_publish_channel(data), message=self.encoder(data))
 
     def _add_route(self, app, route):
         def r():
+            print 'FDSFDSFSD'
+            print flask.request.get_json()
+            print 'ggfgfgfd'
             data = flask.request.form.copy()
             logger.debug('POST data received: %s', data)
             self.post_process(data)
             return 'Ok'
 
-        # if self._get_allow_cross_origin():
-        #    r = flask.ext.cors.cross_origin(r)
         app.route(route, methods=["POST"])(r)
 
     def _build_app(self):
@@ -75,6 +99,7 @@ class HttpServer(minion.sensing.base.BaseSensor):
             flask.ext.cors.CORS(app)
         # Could be a single route
         route = self._get_route()
+        print 'route', route
         if isinstance(route, six.string_types):
             self._add_route(app, route)
         else:
