@@ -32,7 +32,15 @@ if __name__ == '__main__':
 
     a_one = int(sum(real_ones, 0.0) / len(real_ones))
 
-    print real_ones
+    binary = []
 
-    print a_zero, a_one
+    for x in ones:
+        if closest(x, a_zero, a_one) is a_zero:
+            binary.append('0')
+        else:
+            binary.append('1')
+
+    print 'Zero: {}'.format(a_zero)
+    print 'One: {}'.format(a_one)
+    print ''.join(binary)
 
