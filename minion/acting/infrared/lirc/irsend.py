@@ -17,4 +17,7 @@ class IrsendActuator(minion.acting.base.ShellCommandActuator):
         return 'astro'
 
     def _build_command(self, *args, **kwargs):
-        return ['irsend', 'SEND_ONCE', self._get_remote_control_name()] + list(args)
+        # Clean up cause it doesnt seem to like quotes
+        keys = [x.replace('"', '') for x in list(args)]
+
+        return ['irsend', 'SEND_ONCE', self._get_remote_control_name()] + keys
