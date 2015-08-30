@@ -79,15 +79,13 @@ class HttpServer(minion.sensing.base.BaseSensor):
         """
         Override default behavior since publish channel will depend on data
         """
-        self.nervous_system.publish(channel=self.get_publish_channel(data), message=self.encoder(data))
+        self.nervous_system.publish(channel=self.get_publish_channel(data), message=self.encoder.encode(data))
 
     def _add_route(self, app, route):
         def r():
-            print 'FDSFDSFSD'
-            print flask.request.get_json()
-            print 'ggfgfgfd'
-            data = flask.request.form.copy()
-            logger.debug('POST data received: %s', data)
+            data = flask.request.get_json()
+            if data is None:
+                data = flask.request.form.copy()
             self.post_process(data)
             return 'Ok'
 
@@ -99,7 +97,6 @@ class HttpServer(minion.sensing.base.BaseSensor):
             flask.ext.cors.CORS(app)
         # Could be a single route
         route = self._get_route()
-        print 'route', route
         if isinstance(route, six.string_types):
             self._add_route(app, route)
         else:
