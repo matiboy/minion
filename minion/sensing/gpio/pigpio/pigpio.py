@@ -51,7 +51,7 @@ class MCP3008Reader(minion.sensing.base.ContinuousSensor):
     Child classes expect an instance of pigpiod to be running (likely as root)
     """
     def __init__(self, name, nervous_system, configuration={}, preprocessors=[], postprocessors=[], **kwargs):
-        super(Reader, self).__init__(name, nervous_system, configuration, preprocessors, postprocessors, **kwargs)
+        super(MCP3008Reader, self).__init__(name, nervous_system, configuration, preprocessors, postprocessors, **kwargs)
         self.pi = self._setup_pi()
         # Set the pin to input
         self.pi.set_mode(self._get_spimiso(), pigpio.INPUT)
