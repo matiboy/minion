@@ -30,7 +30,6 @@ class CommitToMemory(minion.acting.base.BaseActuator):
         try:
             # Wish I could use python 3's action, *rest = message.split
             all_stuff = message.split(self.get_separator())
-            print 'All the stuff', all_stuff
             # Take the first as action, pass the rest
             action = all_stuff.pop(0)
             getattr(self, action)(*all_stuff)
@@ -45,7 +44,6 @@ class CommitToMemory(minion.acting.base.BaseActuator):
             logger.error('Commit to memory command not recognized %s (from message %s)', action, message)
 
     def set(self, key, value, *args):
-        print 'Key value', key, value, args
         self.redis_client.set(key, value)
 
     def temporary(self, key, value, duration, *args):
