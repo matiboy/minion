@@ -35,3 +35,25 @@ class PrefixRemover(minion.understanding.base.RedirectCommand):
     def _validate_configuration(self):
         self.requires_configuration_key('prefix')
         self.requires_non_empty_configuration('prefix')
+
+class PrefixAdder(minion.understanding.base.RedirectCommand):
+    threaded = False
+
+    @minion.core.utils.functions.configuration_getter
+    def get_prefix(self):
+        return None
+
+    @minion.core.utils.functions.configuration_getter
+    def get_channel(self):
+        return 'minion:command'
+
+    def _validate_configuration(self):
+        self.requires_configuration_key('prefix')
+        self.requires_non_empty_configuration('prefix')
+
+    def _get_output(self, original):
+        return '{prefix}{original}'.format(prefix=self.get_prefix(), original=original)
+
+
+
+
