@@ -28,5 +28,4 @@ class LinearPostprocessor(minion.sensing.postprocessors.BasePostprocessor):
             raise minion.sensing.exceptions.DataReadError('Unable to parse <{}> as a float'.format(data))
 
         # Apply
-        print self._get_a(), num, self._get_b()
         return (self._get_a() * num) + self._get_b()

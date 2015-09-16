@@ -113,7 +113,7 @@ class ContinuousSensor(BaseSensor):
 
     @minion.core.utils.functions.configuration_getter
     def _get_period(self):
-        """Configuration getter than falls back to class value or 0 if all that failed"""
+        """Configuration getter that falls back to class value or 0 if all that failed"""
         try:
             # Could be class level
             return self.period
