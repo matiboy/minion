@@ -1,0 +1,29 @@
+extends ./edit.jade
+
+block stylesheets
+    {{ super() }}
+    link(rel='stylesheet', href=url_for('simple_page.static', filename='stylesheets/nerve.css'))
+
+block scripts
+    script.
+        var nerve = !{nervous_system};
+        var availableNerves = !{available_nerves};
+    script(src=url_for('simple_page.static', filename='scripts/nerve.js'))
+    
+
+block content
+    .container(ng-app='Boss')
+        .jumbotron
+            h1 Nervous system
+
+        form(method='post', ng-submit='submit()', ng-controller='NervousSystemController')
+            .form-group
+                label Name
+                input.form-control(type='text', name='name', placeholder='Enter nervous system name', ng-model='obj.name')
+
+            .form-group
+                label Class
+                select.form-control(ng-model='obj.class', ng-options='c as c for c in availableNerveClasses')
+            
+            {% include "./systems.jade" %}
+            button.btn.btn-info(type="submit") Save

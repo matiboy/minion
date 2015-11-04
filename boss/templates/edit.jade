@@ -1,0 +1,8 @@
+extends ./base.jade
+
+block stylesheets
+    link(rel='stylesheet', href=url_for('simple_page.static', filename='stylesheets/editing.css'))
+
+block scripts
+    script(src=url_for('simple_page.static', filename='scripts/edit.js'))
+

@@ -1,0 +1,15 @@
+for system in systems
+    div(ng-show='obj.class=="#{system['class']}"')
+        .form-group
+            label Description
+            .description!=system['description']
+        for field in system['setup']
+            .form-group
+                label=field['message']
+                if field['type'] == 'input'
+                    input.form-control(ng-model='systems["#{system['class']}"].configuration["#{field['name']}"]')
+                else 
+                    if field['type'] == 'select'
+                        select.form-control(ng-model='systems["#{system['class']}"].configuration["#{field['name']}"]')
+                            for opt in field['choices']
+                                option(value=opt)=opt

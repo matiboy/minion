@@ -1,0 +1,42 @@
+doctype
+html.no-js
+    head
+        meta(charset='utf-8')
+        meta(http-equiv='X-UA-Compatible', content='IE=edge')
+        title
+        meta(name='description', content='')
+        meta(name='viewport', content='width=device-width, initial-scale=1')
+        link(rel='stylesheet', href='stylesheets/normalize.css')
+        link(rel='stylesheet', href='stylesheets/main.css')
+        link(rel='stylesheet', href='//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css')
+        link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css')
+        script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js')
+        script(src='//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.8.0/lodash.min.js')
+        script(src='//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.0/ui-bootstrap-tpls.min.js')
+        block stylesheets
+        block scripts
+        //-script(src='javascripts/vendor/modernizr-2.7.1.min.js')
+    body
+        <!--[if lt IE 8]>
+        p.browsehappy
+            | You are using an <strong>outdated</strong> browser.
+            | Please <a href="http://browsehappy.com/">upgrade your browser</a>
+            | to improve your experience.
+        <![endif]-->
+
+    nav.navbar.navbar-default
+        .container-fluid
+            ul.nav.navbar-nav
+                li
+                    a(href=url_for('simple_page.dashboard')) Home
+                li
+                    a(href=url_for('simple_page.nerve')) Nervous system
+                li
+                    a(href=url_for('simple_page.component_list', component_type='sensors')) Sensors
+                li
+                    a(href=url_for('simple_page.component_list', component_type='commands')) Commands
+                li
+                    a(href=url_for('simple_page.component_list', component_type='actuators')) Actuators
+
+
+    block content

@@ -1,0 +1,16 @@
+.description {
+    padding-left: 30px;
+}
+
+.description h3 {
+    
+}
+
+.description p {
+    padding: 0;
+}
+
+.description dd {
+    padding-left: 20px;
+    font-style: italic;
+}

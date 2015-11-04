@@ -1,0 +1,32 @@
+div(ng-controller="PostprocessorsController")
+    div
+        h4 Add post processors
+        select(ng-model="pp.class", ng-options="pp as pp for pp in availablePostprocessClasses")
+        for pp in postprocessors
+            div(ng-show='pp.class=="#{pp['class']}"')
+                .row
+                    .col-xs-6
+                        for field in pp['setup']
+                            .form-group
+                                label=field['message']
+                                if field['type'] == 'input'
+                                    input.form-control(ng-model='p["#{pp['class']}"].configuration["#{field['name']}"]')
+                        .btn.btn-success(ng-click="addPostprocessor()") Add
+                    .col-xs-6
+                        .form-group
+                            label Description
+                            .description!=pp['description']
+
+    div
+        h4 Current post processors
+        ol
+            li(ng-repeat="row in obj.postprocessors")
+                h5(ng-bind="row.name + '(' + row.class + ')'")
+                ul
+                    li(ng-repeat="(k, v) in row.configuration")
+                        b(ng-bind="k + ': '")
+                        span(ng-bind="v")
+
+                .btn.btn-small.btn-danger(ng-click="removePostprocessor($index)") Remove
+
+

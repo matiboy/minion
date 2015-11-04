@@ -1,0 +1,25 @@
+.ok {
+    color: green;
+    position: relative;
+    top: -60px;
+    left: 52px;
+}
+
+i.ok {
+    font-size: 2em;
+}
+
+span.badge {
+    color: white;
+    background: orange;
+}
+
+span.ok {
+    background: green;
+}
+
+#dashboard td {
+    text-align: center;
+    position: relative;
+}
+

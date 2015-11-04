@@ -1,0 +1,45 @@
+extends ./base.jade
+
+block stylesheets
+    link(rel='stylesheet', href=url_for('simple_page.static', filename='stylesheets/dashboard.css'))
+    
+
+block content
+    .container
+        .jumbotron
+            h1 Patalaki patalaku Big Boss
+
+        table#dashboard.table
+            tr
+                td
+                    a(href=url_for('simple_page.nerve'))
+                        i.fa.fa-5x.fa-connectdevelop
+                        p Nervous system
+                        if has_nervous_system
+                            i.ok.fa.fa-check-square-o
+
+                td
+                    a(href=url_for('simple_page.component_list', component_type='sensors'))
+                        i.fa.fa-eye.fa-5x
+                        p Sensors
+                        if sensors_count > 0
+                            span.badge.ok=sensors_count
+                        else
+                            span.badge=sensors_count
+            tr
+                td
+                    a(href=url_for('simple_page.component_list', component_type='commands'))
+                        i.fa.fa-5x.fa-cogs
+                        p Commands
+                        if commands_count > 0
+                            span.badge.ok=commands_count
+                        else
+                            span.badge=commands_count
+                td
+                    a(href=url_for('simple_page.component_list', component_type='actuators'))
+                        i.fa.fa-5x.fa-hand-o-up
+                        p Actuators
+                        if actuators_count > 0
+                            span.badge.ok=actuators_count
+                        else
+                            span.badge=actuators_count

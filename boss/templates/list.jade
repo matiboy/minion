@@ -1,0 +1,26 @@
+extends ./base.jade
+
+block content
+    .container(ng-app='Boss')
+        .jumbotron
+            block title
+            a(href=url_for("simple_page.edit_object", component_type=component_type, index=-1))
+                block create_button
+
+        table.table.table-striped
+            thead
+                tr
+                    th #
+                    th Name
+                    th Class
+                    th
+            tbody
+                each item in items
+                        tr
+                            td=item.index
+                            td
+                                a(href=url_for("simple_page.edit_object", component_type=component_type, index=item.index))=item.name
+                            td=item.class
+                            td
+                                form(method="post", action=url_for('simple_page.remove_object', component_type=component_type, index=item.index))
+                                    button.btn.btn-danger(type="submit") Remove

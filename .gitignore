@@ -55,3 +55,6 @@ docs/_build/
 
 # PyBuilder
 target/
+minion.sublime-project
+minion.sublime-workspace
+*.json
