@@ -21,10 +21,10 @@ def before_request():
 def dashboard():
     settings = flask.g.settings
     return flask.render_template('dashboard.jade',
-        has_nervous_system=settings['nerve'],
-        sensors_count=settings['sensors'].__len__(),
-        actuators_count=settings['actuators'].__len__(),
-        commands_count=settings['commands'].__len__()
+        has_nervous_system=settings.get('nerve', {}),
+        sensors_count=settings.get('sensors', []).__len__(),
+        actuators_count=settings.get('actuators', []).__len__(),
+        commands_count=settings.get('commands', []).__len__()
         )
 
 

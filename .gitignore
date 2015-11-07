@@ -58,5 +58,6 @@ target/
 minion.sublime-project
 minion.sublime-workspace
 *.json
+!settings/*.json
 !examples/**/*.json
 tmp
