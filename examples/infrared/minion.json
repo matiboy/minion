@@ -1,0 +1,29 @@
+{
+  "nerve": {
+    "configuration": {
+      "host": "jerry.local",
+      "db": "0",
+      "port": "6379"
+    },
+    "name": "Redis",
+    "class": "minion.nerve.redis.redis.NervousSystem"
+  },
+  "commands": [],
+  "sensors": [{
+      "configuration": {
+        "host": "0.0.0.0",
+        "allow_cross_origin": true,
+        "port": 55555,
+        "channels": "minion:flask"
+      },
+      "name": "HTTP server",
+      "postprocessors": [{
+        "class": "minion.sensing.postprocessors.http.data.post.PostDataPostProcessor",
+        "configuration": {
+
+        }
+      }],
+      "class": "minion.sensing.http.flask.server.HttpServer"
+    }],
+  "actuators": []
+}

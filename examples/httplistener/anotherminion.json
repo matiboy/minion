@@ -1,0 +1,80 @@
+{
+  "nerve": {
+    "configuration": {
+      "host": "192.168.1.103", 
+      "db": "0", 
+      "port": "6379"
+    }, 
+    "name": "Redis", 
+    "class": "minion.nerve.redis.redis.NervousSystem"
+  }, 
+  "commands": [ 
+    {
+      "configuration": {
+        "action": "minion:proximity", 
+        "expressions": [
+          "^MINION OPEN DOOR$",
+          "^MINION OPEN$",
+          "^MINION OPEN THE DOOR$"
+        ], 
+        "what": "/Users/redapesolutions/Downloads/banana.wav"
+      }, 
+      "name": "minion", 
+      "class": "minion.understanding.repeat.AlwaysSaySomething"
+    }
+  ], 
+  "sensors": [
+    { 
+      "configuration": {
+        "delete_audio_file": false, 
+        "silence": {
+          "pre": {
+            "trim": 1, 
+            "duration": 0.05, 
+            "level": "10%"
+          }, 
+          "post": {
+            "trim": 1, 
+            "duration": 0.8, 
+            "level": "10%"
+          }
+        }, 
+        "format": "wav"
+      }, 
+      "name": "Inactive microphone", 
+      "postprocessors": [
+        {
+          "configuration": {
+            "type": "wav", 
+            "maxlength": 10
+          }, 
+          "name": "Duration limit", 
+          "class": "minion.sensing.postprocessors.audio.sox.durationlimit.DurationLimit"
+        }, 
+        {
+          "configuration": {
+            "options": {
+              "lm": "examples/httplistener/3781.lm",
+              "dict": "examples/httplistener/3781.dic"
+            }
+          }, 
+          "name": "Pocketsphinx to text", 
+          "class": "minion.sensing.postprocessors.audio.pocketsphinx.speechtotext.PocketsphinxSpeechToText"
+        }
+      ], 
+      "class": "minion.sensing.ears.sox.microphone.MicrophoneSelectiveListener"
+    }
+  ], 
+  "actuators": [
+    {
+      "channels": [
+        "minion:speak"
+      ], 
+      "configuration": {
+        "voice": "Bruce"
+      }, 
+      "name": "mouth", 
+      "class": "minion.acting.mouth.macosx.say.SimpleSay"
+    } 
+  ]
+}
