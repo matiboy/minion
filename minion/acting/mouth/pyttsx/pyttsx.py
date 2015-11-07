@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import minion.acting.base
 import minion.core.utils.functions
 import multiprocessing
@@ -30,5 +31,5 @@ class SimpleSay(minion.acting.base.BaseActuator):
         return 150
 
     def act(self, *args, **kwargs):
-        t = threading.Thread(target=super(SimpleSay, self).say, args=args)
+        t = threading.Thread(target=self.say, args=args)
         t.start()
