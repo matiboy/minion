@@ -1,0 +1,39 @@
+{
+  "nerve": {
+    "configuration": {
+      "host": "192.168.1.103",
+      "db": "0",
+      "port": "6379"
+    },
+    "name": "Redis",
+    "class": "minion.nerve.redis.redis.NervousSystem"
+  },
+  "commands": [
+
+  ],
+  "sensors": [
+
+  ],
+  "actuators": [
+    {
+      "channels": [
+        "minion:rfidtag"
+      ],
+      "configuration": {
+        "voice": "Bruce"
+      },
+      "name": "mouth",
+      "class": "minion.acting.mouth.macosx.say.SimpleSay"
+    },
+    {
+      "channels": [
+        "minion:play"
+      ],
+      "name": "mouth2",
+      "class": "minion.acting.mouth.wavplayer.pyglet.PygletPlayer",
+      "configuration": {
+        "root_directory": "/Users/redapesolutions/Documents"
+      }
+    }
+  ]
+}
