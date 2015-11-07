@@ -1,0 +1,55 @@
+{
+  "nerve": {
+    "configuration": {
+      "host": "localhost",
+      "db": "0",
+      "port": "6379"
+    },
+    "name": "Redis",
+    "class": "minion.nerve.redis.redis.NervousSystem"
+  },
+  "commands": [
+    {
+      "name": "Add a prefix",
+      "class": "minion.understanding.prefix.prefix.PrefixAdder",
+      "configuration": {
+        "prefix": "set room_temperature ",
+        "action": "minion:set_temperature",
+        "channel": "minion:temperature",
+        "expressions": ["[0-9\\.]+"]
+      },
+      "channels": ["minion:whatevs"]
+    }
+  ],
+  "sensors": [
+    {
+      "configuration": {
+        "message": "90",
+        "period": "5",
+        "immediate": true,
+        "publish_channel": "minion:temperature"
+      },
+      "name": "Hearts",
+      "postprocessors": [
+        {
+          "configuration": {
+            "a": 0.3225,
+            "b": 0
+          },
+          "class": "minion.sensing.postprocessors.calculations.linear.LinearPostprocessor",
+          "name": "minion.sensing.postprocessors.calculations.linear.LinearPostprocessor"
+        }
+      ],
+      "class": "minion.sensing.heartbeat.beat.Heartbeat"
+    }
+  ],
+  "actuators": [
+    {
+      "channels": [
+        "minion:set_temperature"
+      ],
+      "class": "minion.acting.memory.redis.commit.CommitToMemory",
+      "name": "Remember temperature"
+    }
+  ]
+}

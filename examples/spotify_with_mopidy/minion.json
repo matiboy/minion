@@ -1,0 +1,147 @@
+{
+  "nerve": {
+    "configuration": {
+      "host": "localhost",
+      "db": "3",
+      "port": "6379"
+    },
+    "name": "Redis",
+    "class": "minion.nerve.redis.redis.NervousSystem"
+  },
+  "commands": [
+    {
+      "configuration": {
+        "expressions": [
+          "NEXT SONG",
+          "PLAY NEXT SONG"
+        ]
+      },
+      "name": "Next song",
+      "class": "minion.understanding.mopidy.mopidy.NextSong"
+    },
+    {
+      "configuration": {
+        "expressions": [
+          "PREVIOUS SONG",
+          "PLAY PREVIOUS SONG"
+        ]
+      },
+      "name": "Previous song",
+      "class": "minion.understanding.mopidy.mopidy.PreviousSong"
+    },
+    {
+      "configuration": {
+        "expressions": [
+          "PLAY",
+          "PLAY MUSIC"
+        ]
+      },
+      "name": "Play",
+      "class": "minion.understanding.mopidy.mopidy.Play"
+    },
+    {
+      "configuration": {
+        "expressions": [
+          "STOP",
+          "STOP MUSIC",
+          "MUSIC STOP"
+        ]
+      },
+      "name": "Stop",
+      "class": "minion.understanding.mopidy.mopidy.Stop"
+    },
+    {
+      "configuration": {
+        "expressions": [
+          "LOUDER",
+          "VOLUME UP"
+        ]
+      },
+      "name": "Volume up",
+      "class": "minion.understanding.mopidy.mopidy.VolumeUp"
+    },
+    {
+      "configuration": {
+        "expressions": [
+          "NOT SO LOUD",
+          "SOFTER"
+        ]
+      },
+      "name": "Softer",
+      "class": "minion.understanding.mopidy.mopidy.VolumeDown"
+    },
+    {
+      "configuration": {
+        "expressions": [
+          "VOLUME NO"
+        ]
+      },
+      "name": "Mute",
+      "class": "minion.understanding.mopidy.mopidy.Mute"
+    },
+    {
+      "configuration": {
+        "expressions": [
+          "SHUFFLE YES",
+          "SHUFFLE UP"
+        ]
+      },
+      "name": "Shuffle",
+      "class": "minion.understanding.mopidy.mopidy.ShuffleOn"
+    }
+  ],
+  "sensors": [
+    {
+      "configuration": {
+        "delete_audio_file": false,
+        "silence": {
+          "pre": {
+            "trim": 1,
+            "duration": 0.05,
+            "level": "10%"
+          },
+          "post": {
+            "trim": 1,
+            "duration": 0.8,
+            "level": "10%"
+          }
+        },
+        "format": "wav"
+      },
+      "name": "Microphone",
+      "postprocessors": [
+        {
+          "configuration": {
+            "type": "wav",
+            "maxlength": 10
+          },
+          "name": "Duration limit",
+          "class": "minion.sensing.postprocessors.audio.sox.durationlimit.DurationLimit"
+        },
+        {
+          "configuration": {
+            "options": {
+              "lm": "examples/spotify_with_mopidy/4235.lm",
+              "dict": "examples/spotify_with_mopidy/4235.dic"
+            }
+          },
+          "name": "Pocketsphinx to text",
+          "class": "minion.sensing.postprocessors.audio.pocketsphinx.speechtotext.PocketsphinxSpeechToText"
+        }
+      ],
+      "class": "minion.sensing.ears.sox.microphone.MicrophoneSelectiveListener"
+    }
+  ],
+  "actuators": [
+    {
+      "channels": [
+        "minion:mopidy"
+      ],
+      "configuration": {
+        "host": "192.168.1.128"
+      },
+      "name": "Bananapi Mopidy",
+      "class": "minion.acting.spotify.mopidy.mopidy.Mopidy"
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "nerve": {
+    "configuration": {
+      "host": "localhost", 
+      "db": "0", 
+      "port": "6379"
+    }, 
+    "name": "Redis", 
+    "class": "minion.nerve.redis.redis.NervousSystem"
+  }, 
+  "commands": [
+    {
+      "configuration": {
+        "choices": [
+          "i think you are right", 
+          "absolutely correct"
+        ]
+      }, 
+      "name": "friend", 
+      "class": "minion.understanding.repeat.AlwaysSaySomethingRandom"
+    }, 
+    {
+      "name": "activate minion", 
+      "class": "minion.understanding.state.memory.StateToMemory",
+      "configuration": {
+        "state": "minion:active",
+        "expressions": [
+          "^MINION$",
+          "^MINION WAKE UP$",
+          "^MINION WAKE$"
+        ]
+      }
+    }, 
+    {
+      "name": "calendar", 
+      "class": "minion.understanding.calendar.ics.ics.IcsCalendarTodayEvents",
+      "configuration": {
+        "resource": "https://www.google.com/calendar/ical/redapesolutions.com_mrt8lm996vi1kovb39us851l0g%40group.calendar.google.com/public/basic.ics",
+        "expressions": [
+          "^MINION MEETINGS TODAY$",
+          "^MINION WHAT MEETINGS DO I HAVE TODAY$"
+        ]
+      }
+    }, 
+    {
+      "name": "calendar2", 
+      "class": "minion.understanding.calendar.ics.ics.IcsCalendarTomorrowEvents",
+      "configuration": {
+        "resource": "https://www.google.com/calendar/ical/redapesolutions.com_mrt8lm996vi1kovb39us851l0g%40group.calendar.google.com/public/basic.ics",
+        "expressions": [
+          "^MINION MEETINGS TOMORROW$",
+          "^MINION WHAT MEETINGS DO I HAVE TOMORROW$"
+        ]
+      }
+    }, 
+    {
+      "name": "deactivate minion", 
+      "class": "minion.understanding.state.memory.ForgetState",
+      "configuration": {
+        "state": "minion:active",
+        "expressions": [
+          "^MINION GO TO SLEEP$",
+          "^MINION SLEEP$"
+        ]
+      }
+    }
+  ], 
+  "sensors": [
+    { 
+      "configuration": {
+        "host": "0.0.0.0", 
+        "port": 55555, 
+        "ssl_certificate": "examples/httpslistener/server.crt",
+        "ssl_key": "examples/httpslistener/server.key"
+      }, 
+      "name": "HTTPS server", 
+      "postprocessors": [], 
+      "class": "minion.sensing.http.flask.server.HttpsServer"
+    }
+  ], 
+  "actuators": [
+    {
+      "channels": [
+        "minion:speak"
+      ], 
+      "configuration": {
+        "voice": "Bruce"
+      }, 
+      "name": "mouth", 
+      "class": "minion.acting.mouth.macosx.say.SimpleSay"
+    }, 
+    {
+      "channels": [
+        "minion:play"
+      ], 
+      "name": "mouth2", 
+      "class": "minion.acting.mouth.wavplayer.pyglet.PygletPlayer"
+    }, 
+    {
+      "channels": [
+        "minion:committomemory"
+      ], 
+      "configuration": {
+        "host": "localhost", 
+        "db": "0", 
+        "port": "6379"
+      }, 
+      "name": "Commit to redis memory", 
+      "class": "minion.acting.memory.redis.commit.CommitToMemory"
+    }
+  ]
+}

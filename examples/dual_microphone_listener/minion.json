@@ -1,0 +1,254 @@
+{
+  "nerve": {
+    "configuration": {
+      "host": "localhost", 
+      "db": "3", 
+      "port": "6379"
+    }, 
+    "name": "Redis", 
+    "class": "minion.nerve.redis.redis.NervousSystem"
+  }, 
+  "commands": [
+    {
+      "configuration": {
+        "actions": [
+          "house:set:value"
+        ], 
+        "acknowledge": true
+      }, 
+      "name": "APIai command", 
+      "class": "minion.understanding.apiai.warehouse.Warehouse"
+    }, 
+    {
+      "configuration": {
+        "actions": [
+          "apiai:fulfillment"
+        ]
+      }, 
+      "name": "APIai acknowledge fulfillment", 
+      "class": "minion.understanding.apiai.fulfillment.Fulfillment"
+    }, 
+    {
+      "configuration": {
+        "expressions": [
+          "^say (?P<what_to_repeat>.*)$", 
+          "^repeat after me (?P<what_to_repeat>.*)$"
+        ]
+      }, 
+      "name": "parrot", 
+      "class": "minion.understanding.repeat.RepeatAfterMe"
+    }, 
+    {
+      "configuration": {
+        "action": "minion:play", 
+        "expressions": [
+          "^MINION$",
+          "^MINION WAKE UP$"
+        ], 
+        "what": "/Users/redapesolutions/Downloads/banana.wav"
+      }, 
+      "name": "minion", 
+      "class": "minion.understanding.repeat.AlwaysSaySomething"
+    }, 
+    {
+      "configuration": {
+        "choices": [
+          "i think you are right", 
+          "absolutely correct"
+        ]
+      }, 
+      "name": "friend", 
+      "class": "minion.understanding.repeat.AlwaysSaySomethingRandom"
+    }, 
+    {
+      "name": "decision_maker", 
+      "class": "minion.understanding.repeat.decision.Decide"
+    }, 
+    {
+      "configuration": {
+        "expressions": [
+          "^toss a coin$", 
+          "^heads or tails$", 
+          "^heads or tail$"
+        ], 
+        "choices": [
+          "heads", 
+          "tails"
+        ]
+      }, 
+      "name": "coin", 
+      "class": "minion.understanding.repeat.AlwaysSaySomethingRandom"
+    }, 
+    {
+      "name": "clock", 
+      "class": "minion.understanding.calendar.time.GiveMeTheTime"
+    }, 
+    {
+      "configuration": {
+        "confirmation_command": "", 
+        "key": "minion:remindme"
+      }, 
+      "name": "reminder", 
+      "class": "minion.understanding.memory.reminder.RemindMe"
+    }, 
+    {
+      "configuration": {
+        "confirmation_command": "say counting down {numbers} {unit} {what}", 
+        "expressions": [
+          "^(?:countdown|count down) (?P<to_be_parsed>.*)"
+        ], 
+        "future_command": "say count down over {what}", 
+        "key": "minion:remindme"
+      }, 
+      "name": "countdown", 
+      "class": "minion.understanding.memory.reminder.RemindMe"
+    }, 
+    {
+      "name": "random quote", 
+      "class": "minion.understanding.quotes.forismatic.RandomQuote"
+    }, 
+    {
+      "name": "activate minion", 
+      "class": "minion.understanding.state.memory.StateToMemory",
+      "configuration": {
+        "state": "minion:active",
+        "expressions": [
+          "^MINION$",
+          "^MINION WAKE UP$",
+          "^MINION WAKE$"
+        ]
+      }
+    }, 
+    {
+      "name": "deactivate minion", 
+      "class": "minion.understanding.state.memory.ForgetState",
+      "configuration": {
+        "state": "minion:active",
+        "expressions": [
+          "^MINION GO TO SLEEP$",
+          "^MINION SLEEP$"
+        ]
+      }
+    }
+  ], 
+  "sensors": [
+    { 
+      "configuration": {
+        "delete_audio_file": false, 
+        "silence": {
+          "pre": {
+            "trim": 1, 
+            "duration": 0.05, 
+            "level": "10%"
+          }, 
+          "post": {
+            "trim": 1, 
+            "duration": 0.8, 
+            "level": "10%"
+          }
+        }, 
+        "format": "wav"
+      }, 
+      "name": "Inactive microphone", 
+      "postprocessors": [
+        {
+          "configuration": {
+            "type": "wav", 
+            "maxlength": 10
+          }, 
+          "name": "Duration limit", 
+          "class": "minion.sensing.postprocessors.audio.sox.durationlimit.DurationLimit"
+        }, 
+        {
+          "configuration": {
+            "options": {
+              "lm": "examples/dual_microphone_listener/5422.lm",
+              "dict": "examples/dual_microphone_listener/5422.dic"
+            }
+          }, 
+          "name": "Pocketsphinx to text", 
+          "class": "minion.sensing.postprocessors.audio.pocketsphinx.speechtotext.PocketsphinxSpeechToText"
+        }
+      ], 
+      "class": "minion.sensing.ears.sox.microphone.MicrophoneSelectiveListener"
+    },
+    {
+      "preprocessors": [
+        {
+          "class": "minion.preprocessors.redis.intents.IntentExists",
+          "configuration": {
+            "key": "minion:active"
+          }
+        }
+      ],
+      "configuration": {
+        "delete_audio_file": true, 
+        "silence": {
+          "pre": {
+            "trim": 1, 
+            "duration": 0.05, 
+            "level": "10%"
+          }, 
+          "post": {
+            "trim": 1, 
+            "duration": 0.8, 
+            "level": "10%"
+          }
+        }, 
+        "format": "wav"
+      }, 
+      "name": "Ears", 
+      "postprocessors": [
+        {
+          "configuration": {
+            "type": "wav", 
+            "maxlength": 10
+          }, 
+          "name": "Duration limit", 
+          "class": "minion.sensing.postprocessors.audio.sox.durationlimit.DurationLimit"
+        }, 
+        {
+          "configuration": {
+            "parser": "action", 
+            "SUBSCRIBTION_KEY": "5c50eb66-577d-4a4e-82eb-3fff1bbf6acc", 
+            "CLIENT_ACCESS_TOKEN": "a38eaff38a914771937b2694ac615202"
+          }, 
+          "name": "api.ai to text", 
+          "class": "minion.sensing.postprocessors.audio.apiai.speechtotext.ApiaiSpeechToText"
+        }
+      ], 
+      "class": "minion.sensing.ears.sox.microphone.MicrophoneSelectiveListener"
+    }
+  ], 
+  "actuators": [
+    {
+      "channels": [
+        "minion:speak"
+      ], 
+      "configuration": {
+        "voice": "Bruce"
+      }, 
+      "name": "mouth", 
+      "class": "minion.acting.mouth.macosx.say.SimpleSay"
+    }, 
+    {
+      "channels": [
+        "minion:play"
+      ], 
+      "name": "mouth2", 
+      "class": "minion.acting.mouth.wavplayer.pyglet.PygletPlayer"
+    }, 
+    {
+      "channels": [
+        "minion:committomemory"
+      ], 
+      "configuration": {
+        "host": "localhost", 
+        "db": "0", 
+        "port": "6379"
+      }, 
+      "name": "Commit to redis memory", 
+      "class": "minion.acting.memory.redis.commit.CommitToMemory"
+    }
+  ]
+}
