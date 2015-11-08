@@ -6,10 +6,10 @@ defines = {
             'name': 'Redis',
             'class': 'minion.nerve.redis.redis.NervousSystem',
             'description': '''
-# Redis based nervous system.
-#
-# Fast event based system.
-# Set up host, port and db according to your environment
+<h3>Redis based nervous system.</h3>
+
+<p>Fast event based system.</p>
+<p>Set up host, port, db and password according to your environment</p>
             ''',
             'setup': [
                 {
@@ -29,6 +29,12 @@ defines = {
                     'default': '0',
                     'type': 'input',
                     'message': 'Select Redis db'
+                },
+                {
+                    'name': 'password',
+                    'default': '',
+                    'type': 'input',
+                    'message': 'Redis password'
                 }
             ],
             'requirements': (

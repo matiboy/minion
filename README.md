@@ -6,6 +6,33 @@ It is built to be **distributed** so the sensors and actuators can be **spread o
 
 Configuration is handled via a **JSON file**, which makes it easy to read without requiring much programming knowledge. Minion also has a simple [web based dashboard](./boss) - codename "Big Boss" - to help you manage the various Minion configurations. It is fully functional at this stage, but not fully tested.
 
+## Getting started
+
+### Clone the repo
+
+```
+  $ git clone https://github.com/matiboy/minion.git
+```
+
+### Install requirements
+
+Install basic requirements using the command
+
+```
+  $ pip install -r minimum_requirements.txt
+```
+
+This installs **only** what is required for Minion and the [Big Boss](./boss) to work. As you install components, the Big Boss will attempt to pip install any extra Python requirement. Please refer to the README.md file in each component for further information.
+
+### Create a config
+
+There are two ways to start a config:
+
+Either copy a config from one of the examples in the "examples" folder.
+
+Or you could simply fire up the [Big Boss](./boss#getting-started) and go through the 4 sections: Nervous System, Sensors, Actuators and Commands.
+
+
 ## Current release v0.1.0 "Just-above-the-crossbar"
 
 ![alt text](http://media4.giphy.com/media/h7FwW161xjopW/giphy.gif "Slightly off football kick")
@@ -33,32 +60,6 @@ Minion requires 4 components to function fully:
 - a brain which understands a list of commands sent by the sensors' signals
 - actuators to react when the brain says so: mouth (espeak/say or other TTS), hands (GPIO, shell commands) etc
 - and very importantly, a nervous system to pass messages along
-
-## Getting started
-
-### Clone the repo
-
-```
-  $ git clone https://github.com/matiboy/minion.git
-```
-
-### Install requirements
-
-Install basic requirements using the command
-
-```
-  $ pip install -r requirements.txt
-```
-
-This installs **only** what is required for Minion and the [Big Boss](./boss) to work. As you install components, the Big Boss will attempt to pip install any extra Python requirement. Please refer to the README.md file in each component for further information.
-
-### Create a config
-
-There are two ways to start a config:
-
-The easiest way is to copy a config from one of the examples in the "examples" folder.
-
-Or you could simply fire up the [Big Boss](./boss#getting-started) and go through the 4 sections: Nervous System, Sensors, Actuators and Commands.
 
 ## Sensors
 
