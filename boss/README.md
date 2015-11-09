@@ -47,6 +47,19 @@ So head to Sensors, click "Add new" and in the form, under the class, select `mi
 
 ### Make the Minion understand
 
-Let's now add a command so Minion understands what to do with "say hi".
+Let's now add a command so Minion understands what to do with "say hi". Add a command component and choose the `minion.understanding.prefix.prefix.PrefixRemover` type and enter prefix: "say". Now Minion will listen to all commands starting with "say", remove that prefix and broadcast the rest of the message (in our case "hi") to the publish channel. You can see the publish channel under the Channels tab, it is `minion:do` (feel free to change it)
+
+### Say it!
+
+Finally, let's have an actuator speak out the message. Create an actuator, name it "Mouth" and choose type `minion.acting.mouth.macosx.say.SimpleSay` if on Mac, or `minion.acting.mouth.pyttsx.pyttsx.SimpleSay` if on Linux.
+
+In the channels tab, let's make sure to have the `minion:do` channel as one of the entries, or the channel you picked for the "Say hi!" command output. Actuators can listen to several channels, just separate one per line in the textarea.
+
+### Run it!
+Finally, run 
+```
+$ python minion.py run --debug
+```
+to see (hear) the result
 
 

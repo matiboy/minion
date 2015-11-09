@@ -1,15 +1,37 @@
 import flask
+import subprocess
 import boss.settings
 import boss.utils.auth
 import json
 import minion.core.utils.console
 import minion.core.configure
 import minion.core.components
+import threading
 
 simple_page = flask.Blueprint('simple_page', __name__, template_folder='boss/templates', static_folder='boss/static', static_url_path='/static/boss')
 app = flask.Flask(__name__)
 app.jinja_env.add_extension('pyjade.ext.jinja.PyJadeExtension')
 
+def install_dependencies(class_name, component_type):
+    modules = minion.core.configure.modules
+    items = modules[component_type]
+    mod = None
+    for x in items:
+        if x['class'] == class_name:
+            mod = x
+            break
+
+    if mod is not None:
+        # Find requirements if any
+        requirements = mod.get('requirements', [])
+
+        if requirements.__len__():
+            thread = threading.Thread(target=subprocess.call, args=[['pip', 'install'] + list(requirements)])
+            thread.start()
+
+            return list(requirements)
+
+    return []
 
 @app.before_request
 def before_request():
@@ -33,8 +55,9 @@ def dashboard():
 def save_nerve():
     setup = flask.request.get_json()
     boss.settings.save('nerve', setup)
-
-    return flask.jsonify(status=0)
+    # Dependencies
+    installs = install_dependencies(setup['class'], minion.core.components.Types.NERVOUS_SYSTEM)
+    return flask.jsonify(status=0, installs=installs)
 
 
 @simple_page.route('/nerve')
@@ -66,7 +89,10 @@ def save_object(component_type):
 
     boss.settings.save(component_type, components)
 
-    return flask.jsonify(status=0)
+    # Dependencies
+    installs = install_dependencies(setup['class'], component_type)
+
+    return flask.jsonify(status=0, installs=installs)
 
 
 @simple_page.route('/remove_object/<component_type>/<index>', methods=['POST'])
@@ -80,7 +106,7 @@ def remove_object(component_type, index):
 
     boss.settings.save(component_type, current_settings)
 
-    return flask.redirect(flask.url_for('simple_page.{}'.format(component_type)))
+    return flask.redirect(flask.url_for('simple_page.component_list', {'component_type': component_type}))
 
 
 @simple_page.route('/components/<component_type>')
@@ -135,6 +161,16 @@ def edit_sensors(obj, index, editing):
         systems=modules[minion.core.components.Types.SENSOR],
         available_postprocessors=json.dumps(modules[minion.core.components.Types.POST_PROCESSOR]),
         postprocessors=modules[minion.core.components.Types.POST_PROCESSOR],
+        )
+
+def edit_commands(obj, index, editing):
+    modules = minion.core.configure.modules
+    return flask.render_template('command.jade',
+        index=index,
+        command=json.dumps(obj),
+        available_commands=json.dumps(modules[minion.core.components.Types.COMMAND]),
+        editing=editing,
+        systems=modules[minion.core.components.Types.COMMAND]
         )
 
 app.register_blueprint(simple_page)

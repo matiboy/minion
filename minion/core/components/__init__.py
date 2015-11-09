@@ -3,12 +3,12 @@ from . import exceptions
 
 
 class Types():
-    ACTUATOR = 'actuator'
-    COMMAND = 'command'
+    ACTUATOR = 'actuators'
+    COMMAND = 'commands'
     NERVOUS_SYSTEM = 'nerve'
-    PRE_PROCESSOR = 'pre_processor'
-    POST_PROCESSOR = 'post_processor'
-    SENSOR = 'sensor'
+    PRE_PROCESSOR = 'pre_processors'
+    POST_PROCESSOR = 'post_processors'
+    SENSOR = 'sensors'
 
 
 class BaseComponent(object):

@@ -1,0 +1,55 @@
+extends ./edit.jade
+
+block stylesheets
+    {{ super() }}
+    link(rel='stylesheet', href=url_for('simple_page.static', filename='stylesheets/command.css'))
+
+block scripts
+    script.
+        var command = !{command};
+        var availableCommands = !{available_commands};
+    if editing
+        script.
+            var editing = true;
+    script(src=url_for('simple_page.static', filename='scripts/command.js'))
+    {{ super () }}
+
+block content
+    .container(ng-app='Boss', ng-controller='CommandController')
+        form(method='post', ng-submit='submit()')
+            .jumbotron
+                if editing
+                    h1(ng-bind="obj.name")
+                else
+                    h1 New command
+                button.btn.btn-info.pull-right(type="submit") Save
+
+            tabset
+                tab(heading="Command details")
+                    .form-group
+                        label Name
+                        input.form-control(type='text', name='name', placeholder='Enter command name', ng-model='obj.name')
+
+                    .form-group
+                        label Class
+                        if editing
+                            p(ng-bind="obj.class")
+                        else
+                            select.form-control(ng-model='obj.class', ng-options='c as c for c in availableCommandClasses')
+                    {% include "./systems.jade" %}
+                tab(heading="Expressions")
+                    p One line per expression
+                    .form-group
+                        label Expressions
+                        textarea.form-control(ng-model='obj.expressions')
+                tab(heading="Channels")
+                    .form-group
+                        label Listen to channel
+                        input.form-control(ng-model='obj.channel')
+
+                    .form-group
+                        label Publish on channel
+                        input.form-control(ng-model='obj.action')
+
+
+

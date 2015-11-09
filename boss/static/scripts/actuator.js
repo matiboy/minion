@@ -1,6 +1,7 @@
 angular.module('Boss', ['ui.bootstrap'])
     .controller('ActuatorController', function($scope, $http) {
         $scope.obj = window.actuator;
+        $scope.obj.channels = $scope.obj.channels ? $scope.obj.channels.join('\n') : 'minion:do\n';
         $scope.availableActuatorClasses = _.pluck(window.availableActuators, 'class');
         // Check current one in same loop
         var currentSystems = {};
@@ -19,7 +20,9 @@ angular.module('Boss', ['ui.bootstrap'])
             _.each($scope.obj.preprocessors, function(p) {
                 p.name = p.class;
             });
-            $http.post('/save_object/actuators', $scope.obj)
+            var obj = angular.copy($scope.obj);
+            obj.channels = obj.channels.split('\n');
+            $http.post('/save_object/actuators', obj)
                 .then(function(resp){
                     window.alert('Actuator saved successfully');
                 })

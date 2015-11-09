@@ -19,7 +19,11 @@ angular.module('Boss', [])
             $scope.obj.configuration = currentSystems[$scope.obj.class].configuration;
             $http.post('/save_nerve', $scope.obj)
                 .then(function(resp){
-                    window.alert('Nervous system saved successfully');
+                    var msg = 'Nervous system saved successfully';
+                    if(resp.data.installs && resp.data.installs.length) {
+                      msg += '\nBigBoss is installing the following dependencies: ' + resp.data.installs.join(', ');
+                    }
+                    window.alert(msg);
                 })
                 .finally(console.debug.bind(console));
         };
