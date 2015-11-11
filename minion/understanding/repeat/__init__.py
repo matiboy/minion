@@ -1,4 +1,5 @@
 import minion.understanding.base
+import minion.core.utils.functions
 import minion.understanding.operations
 import random
 
@@ -16,18 +17,21 @@ class RepeatAfterMe(minion.understanding.base.BaseCommand):
 
 
 class AlwaysSaySomething(minion.understanding.base.BaseCommand):
-    configuration = {
-        'action': 'minion:speak',
-        'expressions': ['^i think (?P<what_i_think>.*)$'],
-        'what': 'i think you are right'
-    }
+    @minion.core.utils.functions.configuration_getter
+    def get_action(self):
+        return 'minion:speak'
 
-    def _what_to_say(self, original_command, *commands):
-        return self.get_configuration('what')
+    @minion.core.utils.functions.configuration_getter
+    def get_expressions(self):
+        return ['^i think (?P<what_i_think>.*)$']
+
+    @minion.core.utils.functions.configuration_getter
+    def get_what(self):
+        return 'i think you are right'
 
     def _understand(self, original_command, *commands):
-        what_to_say = self._what_to_say(original_command, *commands)
-        return minion.understanding.operations.UnderstandingOperation(self.get_command(), what_to_say)
+        what_to_say = self.get_what()
+        return minion.understanding.operations.UnderstandingOperation(self.get_action(), what_to_say)
 
 
 class AlwaysSaySomethingRandom(AlwaysSaySomething):

@@ -56,7 +56,7 @@ class BaseCommand(minion.core.components.BaseComponent):
 
     def get_command(self):
         """Deprecated: Should use get_action instead"""
-        return self.get_configuration('action')
+        return self.get_action()
 
     def matches(self, command):
         commands = []

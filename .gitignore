@@ -61,3 +61,7 @@ minion.sublime-workspace
 !settings/*.json
 !examples/**/*.json
 tmp
+
+# Redis
+# Ignore redis binary dump (dump.rdb) files
+*.rdb

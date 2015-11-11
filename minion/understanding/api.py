@@ -1,6 +1,7 @@
 from . import base
 from . import operations
 import jsonpath_rw
+import minion.core.utils.functions
 import minion.core.components.exceptions
 import multiprocessing
 import requests
@@ -35,21 +36,26 @@ class XMLParser(object):
 
 
 class APICommand(base.BaseCommand):
-    configuration = {
-        'method': 'get'
-    }
     threaded = True
 
+    @minion.core.utils.functions.configuration_getter
+    def get_url(self):
+        return ''
+
+    @minion.core.utils.functions.configuration_getter
+    def get_method(self):
+        return 'get'
+
     def _validate_configuration(self):
-        if not self.get_configuration('url'):
+        if not self.get_url():
             raise minion.core.components.exceptions.ImproperlyConfigured('URL is required for API command')
 
     def _build_API_call(self, original_command, *commands):
-        return (self.get_configuration('url'), {})
+        return (self.get_url(), {})
 
     def _understand(self, original_command, *commands):
         api_call, kwargs = self._build_API_call(original_command, *commands)
-        method = getattr(requests, self.get_configuration('method', 'get'))
+        method = getattr(requests, self.get_method())
         response = method(api_call, **kwargs)
         results = self.parser.parse(response)
 
