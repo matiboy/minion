@@ -165,6 +165,10 @@ def edit_sensors(obj, index, editing):
 
 def edit_commands(obj, index, editing):
     modules = minion.core.configure.modules
+    try:
+        obj['expressions'] = '\n'.join(obj['configuration']['expressions'])
+    except KeyError:
+        obj['expressions'] = ''
     return flask.render_template('command.jade',
         index=index,
         command=json.dumps(obj),

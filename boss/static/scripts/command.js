@@ -21,15 +21,18 @@ angular.module('Boss', ['ui.bootstrap'])
 
         $scope.submit = function() {
             $scope.obj.configuration = currentSystems[$scope.obj.class].configuration;
-            if($scope.obj.channel) {
-                $scope.obj.configuration.channel = $scope.obj.channel;
-                delete $scope.obj.channel;
+            var obj = angular.copy($scope.obj);
+            if(obj.channel) {
+                obj.configuration.channel = obj.channel;
+                delete obj.channel;
             }
-            if($scope.obj.action) {
-                $scope.obj.configuration.action = $scope.obj.action;
-                delete $scope.obj.action;
+            if(obj.action) {
+                obj.configuration.action = obj.action;
+                delete obj.action;
             }
-            $http.post('/save_object/commands', $scope.obj)
+            obj.configuration.expressions = obj.expressions.split('\n')
+            delete obj.expressions;
+            $http.post('/save_object/commands', obj)
                 .then(function(resp){
                     window.alert('Command saved successfully');
                 })
