@@ -47,8 +47,7 @@ class APICommand(base.BaseCommand):
         return 'get'
 
     def _validate_configuration(self):
-        if not self.get_url():
-            raise minion.core.components.exceptions.ImproperlyConfigured('URL is required for API command')
+        self.requires_non_empty_configuration('url')
 
     def _build_API_call(self, original_command, *commands):
         return (self.get_url(), {})
